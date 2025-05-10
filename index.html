@@ -1055,5 +1055,22 @@
             });
         }
     </script>
+
+    // Payment Success ?
+    
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('payment') === 'success') {
+        // Hier die PDF automatisch generieren und herunterladen
+        if (typeof generateAndDownloadPDF === 'function') {
+            setTimeout(() => {
+                generateAndDownloadPDF();
+            }, 500); // kleiner Delay, damit alles geladen ist
+        }
+    }
+});
+</script>
+    
 </body>
 </html
