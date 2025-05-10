@@ -1064,7 +1064,7 @@
                         generateAndDownloadPDF();
                     }, 500); // kleiner Delay, damit alles geladen ist
                 } else {
-                    alert('PDF-Download ist aktuell nicht möglich. Bitte klicken Sie auf „Vorschau“ oder „Als PDF exportieren“.');
+                    alert('PDF-Download ist aktuell nicht möglich. Bitte klicken Sie auf "Vorschau" oder "Als PDF exportieren".');
                 }
             }
         });
@@ -1087,19 +1087,46 @@
 
         // PDF-Generierung und Vorschau
         function generatePDF() {
-            const doc = new window.jspdf.jsPDF();
-            // Daten aus dem Formular holen
+            const doc = new window.jspdf.jsPDF({unit: 'mm', format: 'a4'});
+            // Farben und Layout
+            const lightGray = [240, 240, 240];
+            const headerGray = [220, 220, 220];
+            const borderGray = [180, 180, 180];
+            doc.setFont('helvetica', '');
+            // Titel
+            doc.setFontSize(22);
+            doc.text('Reisekostenabrechnung', 105, 20, {align: 'center'});
+            doc.setLineWidth(0.5);
+            doc.setDrawColor(...borderGray);
+            doc.line(20, 25, 190, 25);
+            // Kopfbereich
+            doc.setFontSize(11);
+            let y = 32;
             const purpose = document.getElementById('purpose').value || '';
             const traveler = document.getElementById('traveler').value || '';
             const department = document.getElementById('department').value || '';
             const costCenter = document.getElementById('cost-center').value || '';
-            const startDate = document.getElementById('start-date').value ? new Date(document.getElementById('start-date').value).toLocaleDateString('de-DE') : '';
-            const endDate = document.getElementById('end-date').value ? new Date(document.getElementById('end-date').value).toLocaleDateString('de-DE') : '';
+            const startDate = document.getElementById('start-date').value ? new Date(document.getElementById('start-date').value).toLocaleString('de-DE') : '';
+            const endDate = document.getElementById('end-date').value ? new Date(document.getElementById('end-date').value).toLocaleString('de-DE') : '';
             const transportType = document.getElementById('transport-type').options[document.getElementById('transport-type').selectedIndex].text;
-            const allowances = document.getElementById('summary-allowances').textContent || '0,00 €';
-            const transport = document.getElementById('transportation-costs').textContent || '0,00 €';
-            const total = document.getElementById('total-amount').textContent || '0,00 €';
-            // Zusätzliche Kosten sammeln
+            doc.setFillColor(...lightGray);
+            doc.rect(20, y-5, 170, 28, 'F');
+            doc.setTextColor(60,60,60);
+            doc.text(`Name: ${traveler}`, 24, y); y += 7;
+            doc.text(`Abteilung: ${department}`, 24, y); y += 7;
+            doc.text(`Kostenträger: ${costCenter}`, 24, y); y += 7;
+            doc.text(`Reisezweck: ${purpose}`, 24, y); y += 7;
+            doc.text(`Zeitraum: ${startDate} bis ${endDate}`, 24, y); y += 7;
+            doc.text(`Transportmittel: ${transportType}`, 24, y); y += 7;
+            y += 2;
+            // Haupttabelle
+            doc.setFontSize(12);
+            doc.setTextColor(0,0,0);
+            // Fahrtkosten
+            let transport = document.getElementById('transportation-costs').textContent || '0,00 €';
+            // Verpflegungspauschalen
+            let allowances = document.getElementById('summary-allowances').textContent || '0,00 €';
+            // Zusätzliche Kosten
             let additionalRows = [];
             const additionalCostsSummary = document.getElementById('additional-costs-summary');
             if (additionalCostsSummary) {
@@ -1111,34 +1138,46 @@
                     }
                 });
             }
-            // Kopf
-            doc.setFontSize(18);
-            doc.text('Reisekostenabrechnung', 105, 20, {align: 'center'});
-            doc.setFontSize(12);
-            let y = 35;
-            doc.text(`Reisezweck: ${purpose}`, 14, y); y += 8;
-            doc.text(`Reisender: ${traveler}`, 14, y); y += 8;
-            doc.text(`Abteilung: ${department}`, 14, y); y += 8;
-            doc.text(`Kostenträger: ${costCenter}`, 14, y); y += 8;
-            doc.text(`Zeitraum: ${startDate} bis ${endDate}`, 14, y); y += 8;
-            doc.text(`Transport: ${transportType}`, 14, y); y += 12;
+            // Übernachtungskosten (aus Zusatzkosten extrahieren)
+            let overnight = additionalRows.filter(r => r[0].includes('Übernachtung')).reduce((sum, r) => sum + parseFloat((r[1]||'0').replace(',','.')), 0);
+            // Nebenkosten (alle anderen Zusatzkosten)
+            let otherCosts = additionalRows.filter(r => !r[0].includes('Übernachtung')).reduce((sum, r) => sum + parseFloat((r[1]||'0').replace(',','.')), 0);
+            // Summen
+            let transportVal = parseFloat((transport.match(/[\d,.]+/)||['0'])[0].replace(',','.'));
+            let allowancesVal = parseFloat((allowances.match(/[\d,.]+/)||['0'])[0].replace(',','.'));
+            let total = document.getElementById('total-amount').textContent || '0,00 €';
             // Tabelle
             doc.autoTable({
                 startY: y,
-                head: [['Position', 'Betrag (€)']],
+                head: [[
+                    'Position',
+                    'Beschreibung',
+                    'Betrag (€)'
+                ]],
                 body: [
-                    ['Verpflegungspauschalen', allowances.replace('€','').replace(',','.')],
-                    ['Fahrtkosten', transport.replace('€','').replace(',','.')],
-                    ...additionalRows.length > 0 ? additionalRows : [['Zusätzliche Kosten', '0.00']],
+                    ['Fahrtkosten', transportType, transportVal.toFixed(2)],
+                    ['Verpflegungspauschalen', '', allowancesVal.toFixed(2)],
+                    ['Übernachtungskosten', '', overnight ? overnight.toFixed(2) : '0.00'],
+                    ...additionalRows.filter(r => !r[0].includes('Übernachtung')).map(r => ['Nebenkosten', r[0], parseFloat((r[1]||'0').replace(',','.')).toFixed(2)]),
                 ],
                 theme: 'grid',
-                styles: {fontSize: 12, cellPadding: 3},
-                headStyles: {fillColor: [30, 64, 175]},
-                columnStyles: {0: {cellWidth: 80}, 1: {cellWidth: 40, halign: 'right'}},
+                styles: {fontSize: 11, cellPadding: 2, lineColor: borderGray, lineWidth: 0.3},
+                headStyles: {fillColor: headerGray, textColor: 60, fontStyle: 'bold'},
+                alternateRowStyles: {fillColor: lightGray},
+                margin: {left: 20, right: 20},
+                tableWidth: 170,
             });
-            y = doc.lastAutoTable.finalY + 10;
-            doc.setFontSize(14);
-            doc.text(`Gesamtbetrag: ${total}`, 14, y);
+            y = doc.lastAutoTable.finalY + 8;
+            // Summenbereich
+            doc.setFontSize(13);
+            doc.setTextColor(30,64,175);
+            doc.text(`Gesamtbetrag: ${total}`, 24, y);
+            doc.setTextColor(0,0,0);
+            y += 12;
+            // Unterschrift
+            doc.setFontSize(11);
+            doc.text('Ort, Datum, Unterschrift:', 24, y);
+            doc.line(60, y+1, 120, y+1);
             return doc;
         }
 
