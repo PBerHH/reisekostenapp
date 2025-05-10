@@ -304,258 +304,259 @@
                         <span class="feature-emoji">📱</span>
                         <span>Auf allen Geräten nutzbar</span>
                     </p>
-            </div>
+                </div>
             </div>
 
             <!-- Input Form -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Input Form -->
-            <div class="lg:col-span-2 bg-white rounded-xl p-6 custom-shadow">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">Reisedaten erfassen</h2>
-                
-                <!-- Basic Travel Info -->
-                <div class="mb-6">
-                    <h3 class="text-lg font-medium text-gray-700 mb-3 flex items-center">
-                        <i class="fas fa-info-circle text-blue-500 mr-2"></i> Grundinformationen
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Reisezweck</label>
-                            <input type="text" id="purpose" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Reisender</label>
-                            <input type="text" id="traveler" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Abteilung</label>
-                            <input type="text" id="department" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Kostenträger</label>
-                            <input type="text" id="cost-center" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Reisezeitraum -->
-                <div class="mb-6">
-                    <h3 class="text-lg font-medium text-gray-700 mb-3 flex items-center">
-                        <i class="fas fa-calendar-alt text-blue-500 mr-2"></i> Reisezeitraum
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Startdatum/-zeit</label>
-                            <input type="datetime-local" id="start-date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="calculateTravelExpenses()">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Enddatum/-zeit</label>
-                            <input type="datetime-local" id="end-date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="calculateTravelExpenses()">
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Verpflegungspauschalen -->
-                <div class="mb-6">
-                    <h3 class="text-lg font-medium text-gray-700 mb-3 flex items-center">
-                        <i class="fas fa-utensils text-blue-500 mr-2"></i> 
-                        Verpflegungspauschalen
-                        <span class="tooltip">
-                            <i class="fas fa-info-circle tooltip-icon"></i>
-                            <span class="tooltip-text">
-                                Die Verpflegungspauschale wird bei gestellten Mahlzeiten gekürzt:
-                                - Frühstück: 20% (5,60€)
-                                - Mittagessen: 40% (11,20€)
-                                - Abendessen: 40% (11,20€)
-                            </span>
-                        </span>
-                    </h3>
-                    <div id="daily-allowances" class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead>
-                                    <tr>
-                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Datum</th>
-                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Pauschale</th>
-                                        <th class="px-4 py-3 text-center text-sm font-medium text-gray-700">Frühstück (-5,60€)</th>
-                                        <th class="px-4 py-3 text-center text-sm font-medium text-gray-700">Mittagessen (-11,20€)</th>
-                                        <th class="px-4 py-3 text-center text-sm font-medium text-gray-700">Abendessen (-11,20€)</th>
-                                        <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">Summe</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-200">
-                                    <!-- Wird dynamisch gefüllt -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Transportation -->
-                <div class="mb-6">
-                    <h3 class="text-lg font-medium text-gray-700 mb-3 flex items-center">
-                                <i class="fas fa-car text-blue-500 mr-2"></i> 
-                                Transportmittel
-                                <span class="tooltip">
-                                    <i class="fas fa-info-circle tooltip-icon"></i>
-                                    <span class="tooltip-text">
-                                        Bei Nutzung eines privaten PKW werden 0,30€ pro gefahrenem Kilometer erstattet. 
-                                        Für andere Transportmittel geben Sie bitte die tatsächlichen Kosten an.
-                                    </span>
-                                </span>
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Transportart</label>
-                            <select id="transport-type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="car">Privater PKW</option>
-                                <option value="train">Bahn</option>
-                                <option value="plane">Flugzeug</option>
-                                <option value="other">Andere</option>
-                            </select>
-                        </div>
-                        <div id="distance-container">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Entfernung (km)</label>
-                            <input type="number" id="distance" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div id="cost-container" class="hidden">
-                            <label class="block text-sm font-medium text-gray-700 mb-1 receipt-required">Kosten (€)</label>
-                            <input type="number" step="0.01" id="transport-cost" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Additional Costs -->
-                <div>
-                    <h3 class="text-lg font-medium text-gray-700 mb-3 flex items-center">
-                                <i class="fas fa-receipt text-blue-500 mr-2"></i> 
-                                Zusätzliche Kosten
-                                <span class="tooltip">
-                                    <i class="fas fa-info-circle tooltip-icon"></i>
-                                    <span class="tooltip-text">
-                                        Hier können Sie weitere Kosten wie Übernachtungen, Parkgebühren oder Taxi erfassen. 
-                                        Bitte bewahren Sie die entsprechenden Belege auf.
-                                    </span>
-                                </span>
-                    </h3>
-                    <div class="space-y-4" id="additional-costs">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Input Form -->
+                <div class="lg:col-span-2 bg-white rounded-xl p-6 custom-shadow">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Reisedaten erfassen</h2>
+                    
+                    <!-- Basic Travel Info -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-medium text-gray-700 mb-3 flex items-center">
+                            <i class="fas fa-info-circle text-blue-500 mr-2"></i> Grundinformationen
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Kostenart</label>
-                                <select class="cost-type w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="accommodation">Übernachtung</option>
-                                    <option value="parking">Parkgebühren</option>
-                                    <option value="taxi">Taxi</option>
-                                    <option value="tickets">Tickets</option>
-                                    <option value="other">Sonstiges</option>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Reisezweck</label>
+                                <input type="text" id="purpose" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Reisender</label>
+                                <input type="text" id="traveler" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Abteilung</label>
+                                <input type="text" id="department" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Kostenträger</label>
+                                <input type="text" id="cost-center" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Reisezeitraum -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-medium text-gray-700 mb-3 flex items-center">
+                            <i class="fas fa-calendar-alt text-blue-500 mr-2"></i> Reisezeitraum
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Startdatum/-zeit</label>
+                                <input type="datetime-local" id="start-date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="calculateTravelExpenses()">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Enddatum/-zeit</label>
+                                <input type="datetime-local" id="end-date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="calculateTravelExpenses()">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Verpflegungspauschalen -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-medium text-gray-700 mb-3 flex items-center">
+                            <i class="fas fa-utensils text-blue-500 mr-2"></i> 
+                            Verpflegungspauschalen
+                            <span class="tooltip">
+                                <i class="fas fa-info-circle tooltip-icon"></i>
+                                <span class="tooltip-text">
+                                    Die Verpflegungspauschale wird bei gestellten Mahlzeiten gekürzt:
+                                    - Frühstück: 20% (5,60€)
+                                    - Mittagessen: 40% (11,20€)
+                                    - Abendessen: 40% (11,20€)
+                                </span>
+                            </span>
+                        </h3>
+                        <div id="daily-allowances" class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead>
+                                        <tr>
+                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Datum</th>
+                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Pauschale</th>
+                                            <th class="px-4 py-3 text-center text-sm font-medium text-gray-700">Frühstück (-5,60€)</th>
+                                            <th class="px-4 py-3 text-center text-sm font-medium text-gray-700">Mittagessen (-11,20€)</th>
+                                            <th class="px-4 py-3 text-center text-sm font-medium text-gray-700">Abendessen (-11,20€)</th>
+                                            <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">Summe</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        <!-- Wird dynamisch gefüllt -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Transportation -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-medium text-gray-700 mb-3 flex items-center">
+                                    <i class="fas fa-car text-blue-500 mr-2"></i> 
+                                    Transportmittel
+                                    <span class="tooltip">
+                                        <i class="fas fa-info-circle tooltip-icon"></i>
+                                        <span class="tooltip-text">
+                                            Bei Nutzung eines privaten PKW werden 0,30€ pro gefahrenem Kilometer erstattet. 
+                                            Für andere Transportmittel geben Sie bitte die tatsächlichen Kosten an.
+                                        </span>
+                                    </span>
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Transportart</label>
+                                <select id="transport-type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="car">Privater PKW</option>
+                                    <option value="train">Bahn</option>
+                                    <option value="plane">Flugzeug</option>
+                                    <option value="other">Andere</option>
                                 </select>
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1 receipt-required">Betrag (€)</label>
-                                <input type="number" step="0.01" class="cost-amount w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <div id="distance-container">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Entfernung (km)</label>
+                                <input type="number" id="distance" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
-                            <div class="flex items-end">
-                                <button type="button" class="add-cost-btn w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                                    Hinzufügen
-                                </button>
+                            <div id="cost-container" class="hidden">
+                                <label class="block text-sm font-medium text-gray-700 mb-1 receipt-required">Kosten (€)</label>
+                                <input type="number" step="0.01" id="transport-cost" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
                         </div>
-                    </div>
-                    <div id="costs-list" class="mt-4 space-y-2"></div>
-                </div>
-                
-                <!-- Signature Fields -->
-                <div class="mt-8">
-                    <h3 class="text-lg font-medium text-gray-700 mb-3 flex items-center">
-                        <i class="fas fa-signature text-blue-500 mr-2"></i> Unterschriftsfelder
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Name Antragsteller</label>
-                            <input type="text" id="applicant-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Name Genehmiger</label>
-                            <input type="text" id="approver-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Calculate Button -->
-                <div class="mt-8">
-                    <button id="calculate-btn" class="w-full bg-blue-600 text-white py-3 px-6 rounded-md text-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
-                        Berechnen <i class="fas fa-calculator ml-2"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Results Section -->
-            <div class="lg:col-span-1">
-                <div class="bg-white rounded-xl p-6 custom-shadow sticky top-6">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Zusammenfassung</h2>
-                    
-                    <div id="summary-placeholder" class="text-center py-8 text-gray-500">
-                        <i class="fas fa-file-alt text-4xl mb-3"></i>
-                        <p>Bitte geben Sie Ihre Reisedaten ein und klicken Sie auf "Berechnen", um eine detaillierte Aufstellung Ihrer Reisekosten zu erhalten.</p>
                     </div>
                     
-                    <div id="results-container" class="hidden">
-                        <!-- Reiseinformationen -->
-                        <div class="mb-6">
-                            <h3 class="text-lg font-medium text-gray-700 mb-2">Reiseinformationen</h3>
-                            <div class="bg-gray-50 p-3 rounded-lg">
-                                <p class="text-sm"><span class="font-medium">Zweck:</span> <span id="summary-purpose"></span></p>
-                                <p class="text-sm"><span class="font-medium">Reisender:</span> <span id="summary-traveler"></span></p>
-                                <p class="text-sm"><span class="font-medium">Abteilung:</span> <span id="summary-department"></span></p>
-                                <p class="text-sm"><span class="font-medium">Kostenträger:</span> <span id="summary-cost-center"></span></p>
-                                <p class="text-sm"><span class="font-medium">Zeitraum:</span> <span id="summary-dates"></span></p>
-                                <p class="text-sm"><span class="font-medium">Transport:</span> <span id="summary-transport"></span></p>
-                            </div>
-                        </div>
-                        
-                        <!-- Fahrtkosten -->
-                        <div class="mb-6">
-                            <h3 class="text-lg font-medium text-gray-700 mb-2">Fahrtkosten</h3>
-                            <div id="transportation-costs" class="bg-gray-50 p-3 rounded-lg"></div>
-                        </div>
-                        
-                        <!-- Zusätzliche Kosten -->
-                        <div class="mb-6">
-                            <h3 class="text-lg font-medium text-gray-700 mb-2">Zusätzliche Kosten</h3>
-                            <div id="additional-costs-summary" class="bg-gray-50 p-3 rounded-lg">
-                                <p class="text-sm text-gray-500" id="no-additional-costs">Keine zusätzlichen Kosten erfasst</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Verpflegungspauschalen -->
-                        <div class="mb-6">
-                            <h3 class="text-lg font-medium text-gray-700 mb-2">Verpflegungspauschalen</h3>
-                            <div class="bg-gray-50 p-3 rounded-lg">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-sm">Summe Verpflegungspauschalen:</span>
-                                    <span class="font-medium" id="summary-allowances">0,00 €</span>
+                    <!-- Additional Costs -->
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-700 mb-3 flex items-center">
+                                    <i class="fas fa-receipt text-blue-500 mr-2"></i> 
+                                    Zusätzliche Kosten
+                                    <span class="tooltip">
+                                        <i class="fas fa-info-circle tooltip-icon"></i>
+                                        <span class="tooltip-text">
+                                            Hier können Sie weitere Kosten wie Übernachtungen, Parkgebühren oder Taxi erfassen. 
+                                            Bitte bewahren Sie die entsprechenden Belege auf.
+                                        </span>
+                                    </span>
+                        </h3>
+                        <div class="space-y-4" id="additional-costs">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Kostenart</label>
+                                    <select class="cost-type w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="accommodation">Übernachtung</option>
+                                        <option value="parking">Parkgebühren</option>
+                                        <option value="taxi">Taxi</option>
+                                        <option value="tickets">Tickets</option>
+                                        <option value="other">Sonstiges</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1 receipt-required">Betrag (€)</label>
+                                    <input type="number" step="0.01" class="cost-amount w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div class="flex items-end">
+                                    <button type="button" class="add-cost-btn w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                        Hinzufügen
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Gesamtbetrag -->
-                        <div class="mb-6">
-                            <h3 class="text-lg font-medium text-gray-700 mb-2">Gesamtbetrag</h3>
-                            <div class="bg-blue-50 p-3 rounded-lg">
-                                <p class="text-lg font-bold text-blue-800" id="total-amount">0,00 €</p>
+                        <div id="costs-list" class="mt-4 space-y-2"></div>
+                    </div>
+                    
+                    <!-- Signature Fields -->
+                    <div class="mt-8">
+                        <h3 class="text-lg font-medium text-gray-700 mb-3 flex items-center">
+                            <i class="fas fa-signature text-blue-500 mr-2"></i> Unterschriftsfelder
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Name Antragsteller</label>
+                                <input type="text" id="applicant-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Name Genehmiger</label>
+                                <input type="text" id="approver-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
                         </div>
+                    </div>
+                    
+                    <!-- Calculate Button -->
+                    <div class="mt-8">
+                        <button id="calculate-btn" class="w-full bg-blue-600 text-white py-3 px-6 rounded-md text-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+                            Berechnen <i class="fas fa-calculator ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Results Section -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-xl p-6 custom-shadow sticky top-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Zusammenfassung</h2>
                         
-                        <!-- Export Buttons -->
-                        <div class="flex justify-end mt-4 space-x-4">
-                            <button onclick="showPdfPreview()" 
-                                    class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded flex items-center">
-                                Vorschau <i class="fas fa-eye ml-2"></i>
-                            </button>
-                            <button onclick="window.open('https://buy.stripe.com/5kAdQW9Fg8Ey6UU9AB', '_blank')" 
-                                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center">
-                                Als PDF exportieren (0,89€) <i class="fas fa-file-pdf ml-2"></i>
-                            </button>
+                        <div id="summary-placeholder" class="text-center py-8 text-gray-500">
+                            <i class="fas fa-file-alt text-4xl mb-3"></i>
+                            <p>Bitte geben Sie Ihre Reisedaten ein und klicken Sie auf "Berechnen", um eine detaillierte Aufstellung Ihrer Reisekosten zu erhalten.</p>
+                        </div>
+                        
+                        <div id="results-container" class="hidden">
+                            <!-- Reiseinformationen -->
+                            <div class="mb-6">
+                                <h3 class="text-lg font-medium text-gray-700 mb-2">Reiseinformationen</h3>
+                                <div class="bg-gray-50 p-3 rounded-lg">
+                                    <p class="text-sm"><span class="font-medium">Zweck:</span> <span id="summary-purpose"></span></p>
+                                    <p class="text-sm"><span class="font-medium">Reisender:</span> <span id="summary-traveler"></span></p>
+                                    <p class="text-sm"><span class="font-medium">Abteilung:</span> <span id="summary-department"></span></p>
+                                    <p class="text-sm"><span class="font-medium">Kostenträger:</span> <span id="summary-cost-center"></span></p>
+                                    <p class="text-sm"><span class="font-medium">Zeitraum:</span> <span id="summary-dates"></span></p>
+                                    <p class="text-sm"><span class="font-medium">Transport:</span> <span id="summary-transport"></span></p>
+                                </div>
+                            </div>
+                            
+                            <!-- Fahrtkosten -->
+                            <div class="mb-6">
+                                <h3 class="text-lg font-medium text-gray-700 mb-2">Fahrtkosten</h3>
+                                <div id="transportation-costs" class="bg-gray-50 p-3 rounded-lg"></div>
+                            </div>
+                            
+                            <!-- Zusätzliche Kosten -->
+                            <div class="mb-6">
+                                <h3 class="text-lg font-medium text-gray-700 mb-2">Zusätzliche Kosten</h3>
+                                <div id="additional-costs-summary" class="bg-gray-50 p-3 rounded-lg">
+                                    <p class="text-sm text-gray-500" id="no-additional-costs">Keine zusätzlichen Kosten erfasst</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Verpflegungspauschalen -->
+                            <div class="mb-6">
+                                <h3 class="text-lg font-medium text-gray-700 mb-2">Verpflegungspauschalen</h3>
+                                <div class="bg-gray-50 p-3 rounded-lg">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm">Summe Verpflegungspauschalen:</span>
+                                        <span class="font-medium" id="summary-allowances">0,00 €</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Gesamtbetrag -->
+                            <div class="mb-6">
+                                <h3 class="text-lg font-medium text-gray-700 mb-2">Gesamtbetrag</h3>
+                                <div class="bg-blue-50 p-3 rounded-lg">
+                                    <p class="text-lg font-bold text-blue-800" id="total-amount">0,00 €</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Export Buttons -->
+                            <div class="flex justify-end mt-4 space-x-4">
+                                <button onclick="showPdfPreview()" 
+                                        class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded flex items-center">
+                                    Vorschau <i class="fas fa-eye ml-2"></i>
+                                </button>
+                                <button onclick="window.open('https://buy.stripe.com/5kAdQW9Fg8Ey6UU9AB', '_blank')" 
+                                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center">
+                                    Als PDF exportieren (0,89€) <i class="fas fa-file-pdf ml-2"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -738,985 +739,142 @@
         </div>
     </div>
 
-    <script>
-        // Globale Variablen
-        const { jsPDF } = window.jspdf;
-        let additionalCosts = [];
-        
-        // Formularfelder automatisch speichern
-        function saveFormData() {
-            const formData = {
-                purpose: document.getElementById('purpose').value,
-                traveler: document.getElementById('traveler').value,
-                department: document.getElementById('department').value,
-                costCenter: document.getElementById('cost-center').value,
-                startDate: document.getElementById('start-date').value,
-                endDate: document.getElementById('end-date').value,
-                transportType: document.getElementById('transport-type').value,
-                distance: document.getElementById('distance').value,
-                transportCost: document.getElementById('transport-cost').value,
-                breakfastProvided: document.getElementById('breakfast-provided').checked,
-                lunchProvided: document.getElementById('lunch-provided').checked,
-                dinnerProvided: document.getElementById('dinner-provided').checked,
-                additionalCosts: additionalCosts,
-                applicantName: document.getElementById('applicant-name').value,
-                approverName: document.getElementById('approver-name').value
-            };
-            
-            localStorage.setItem('reisekosten_form', JSON.stringify(formData));
-        }
-        
-        // Formularfelder laden
-        function loadFormData() {
-            const savedData = localStorage.getItem('reisekosten_form');
-            if (savedData) {
-                const formData = JSON.parse(savedData);
-                document.getElementById('purpose').value = formData.purpose || '';
-                document.getElementById('traveler').value = formData.traveler || '';
-                document.getElementById('department').value = formData.department || '';
-                document.getElementById('cost-center').value = formData.costCenter || '';
-                document.getElementById('start-date').value = formData.startDate || '';
-                document.getElementById('end-date').value = formData.endDate || '';
-                document.getElementById('transport-type').value = formData.transportType || 'car';
-                document.getElementById('distance').value = formData.distance || '';
-                document.getElementById('transport-cost').value = formData.transportCost || '';
-                document.getElementById('breakfast-provided').checked = formData.breakfastProvided || false;
-                document.getElementById('lunch-provided').checked = formData.lunchProvided || false;
-                document.getElementById('dinner-provided').checked = formData.dinnerProvided || false;
-                document.getElementById('applicant-name').value = formData.applicantName || '';
-                document.getElementById('approver-name').value = formData.approverName || '';
-                
-                additionalCosts = formData.additionalCosts || [];
-                updateCostsList();
-            }
-        }
-        
-        // Formular zurücksetzen
-        function resetForm() {
-            if (confirm('Möchten Sie wirklich alle Eingaben zurücksetzen?')) {
-                localStorage.removeItem('reisekosten_form');
-                document.getElementById('purpose').value = '';
-                document.getElementById('traveler').value = '';
-                document.getElementById('department').value = '';
-                document.getElementById('cost-center').value = '';
-                document.getElementById('start-date').value = '';
-                document.getElementById('end-date').value = '';
-                document.getElementById('transport-type').value = 'car';
-                document.getElementById('distance').value = '';
-                document.getElementById('transport-cost').value = '';
-                document.getElementById('breakfast-provided').checked = false;
-                document.getElementById('lunch-provided').checked = false;
-                document.getElementById('dinner-provided').checked = false;
-                document.getElementById('applicant-name').value = '';
-                document.getElementById('approver-name').value = '';
-                additionalCosts = [];
-                updateCostsList();
-                
-                // Ergebnisse zurücksetzen
-                document.getElementById('summary-placeholder').classList.remove('hidden');
-                document.getElementById('results-container').classList.add('hidden');
-            }
-        }
-        
-        // Event Listener für Formularänderungen
-        document.querySelectorAll('input, select').forEach(element => {
-            element.addEventListener('change', saveFormData);
-            element.addEventListener('input', saveFormData);
-        });
-        
-        // Formular beim Laden der Seite wiederherstellen
-        document.addEventListener('DOMContentLoaded', loadFormData);
-        
-        // Reset-Button zur Toolbar hinzufügen
-        document.querySelector('.grid.grid-cols-1.lg\\:grid-cols-3.gap-6').insertAdjacentHTML('beforeend', `
-            <div class="lg:col-span-3 flex justify-end space-x-4 mt-4">
-                <button onclick="resetForm()" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-md flex items-center">
-                    <i class="fas fa-undo mr-2"></i> Formular zurücksetzen
+    <!-- Cookie Banner -->
+    <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4 z-50 hidden">
+        <div class="container mx-auto max-w-6xl">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="mb-4 md:mb-0">
+                    <p class="text-gray-700">
+                        Wir verwenden Cookies, um Ihnen das beste Nutzererlebnis zu bieten. 
+                        <a href="#" onclick="showPrivacyModal()" class="text-blue-600 hover:text-blue-800">Mehr erfahren</a>
+                    </p>
+                </div>
+                <div class="flex space-x-4">
+                    <button onclick="acceptCookies()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                        Akzeptieren
+                    </button>
+                    <button onclick="declineCookies()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">
+                        Ablehnen
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer mit Impressum-Link -->
+    <footer class="bg-gray-50 py-4 mt-8">
+        <div class="container mx-auto max-w-6xl text-center">
+            <div class="flex justify-center space-x-4 text-sm text-gray-600">
+                <a href="#" onclick="showPrivacyModal()" class="hover:text-blue-600">Datenschutz</a>
+                <span>|</span>
+                <a href="#" onclick="showImpressumModal()" class="hover:text-blue-600">Impressum</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Impressum & Datenschutz Modal -->
+    <div id="legal-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="modal-title" class="text-2xl font-bold text-gray-800">Impressum</h2>
+                <button onclick="closeLegalModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
-        `);
-        
-        // Event Listener für Transportart-Änderung
-        document.getElementById('transport-type').addEventListener('change', function() {
-            const transportType = this.value;
-            const distanceContainer = document.getElementById('distance-container');
-            const costContainer = document.getElementById('cost-container');
             
-            if (transportType === 'car') {
-                distanceContainer.classList.remove('hidden');
-                costContainer.classList.add('hidden');
-            } else {
-                distanceContainer.classList.add('hidden');
-                costContainer.classList.remove('hidden');
+            <div id="modal-content" class="space-y-4">
+                <!-- Wird dynamisch gefüllt -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cookie Banner Funktionen
+        function showCookieBanner() {
+            if (!localStorage.getItem('cookieConsent')) {
+                document.getElementById('cookie-banner').classList.remove('hidden');
             }
-        });
-        
-        // Event Listener für Kosten hinzufügen
-        document.querySelector('.add-cost-btn').addEventListener('click', function() {
-            const costType = document.querySelector('.cost-type').value;
-            const costAmount = parseFloat(document.querySelector('.cost-amount').value);
-            
-            if (isNaN(costAmount) || costAmount <= 0) {
-                alert('Bitte geben Sie einen gültigen Betrag ein');
-                return;
-            }
-            
-            const costId = Date.now();
-            additionalCosts.push({
-                id: costId,
-                type: costType,
-                amount: costAmount
-            });
-            
-            updateCostsList();
-            document.querySelector('.cost-amount').value = '';
-        });
-        
-        // Kostenliste aktualisieren
-        function updateCostsList() {
-            const costsList = document.getElementById('costs-list');
-            costsList.innerHTML = '';
-            
-            if (additionalCosts.length === 0) {
-                return;
-            }
-            
-            additionalCosts.forEach(cost => {
-                const costElement = document.createElement('div');
-                costElement.className = 'flex items-center justify-between bg-gray-50 p-2 rounded';
-                costElement.innerHTML = `
-                    <div>
-                        <span class="text-sm font-medium">${getCostTypeName(cost.type)}</span>
-                        <span class="text-sm text-gray-600 ml-2">${cost.amount.toFixed(2)} €</span>
-                    </div>
-                    <button class="delete-cost-btn text-red-500 hover:text-red-700" data-id="${cost.id}">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                `;
-                costsList.appendChild(costElement);
-            });
-            
-            // Event Listener für Löschen-Buttons
-            document.querySelectorAll('.delete-cost-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const costId = parseInt(this.getAttribute('data-id'));
-                    additionalCosts = additionalCosts.filter(cost => cost.id !== costId);
-                    updateCostsList();
-                });
-            });
         }
-        
-        // Kostenartnamen abrufen
-        function getCostTypeName(type) {
-            const types = {
-                'accommodation': 'Übernachtung',
-                'parking': 'Parkgebühren',
-                'taxi': 'Taxi',
-                'tickets': 'Tickets',
-                'other': 'Sonstiges'
-            };
-            return types[type] || type;
+
+        function acceptCookies() {
+            localStorage.setItem('cookieConsent', 'accepted');
+            document.getElementById('cookie-banner').classList.add('hidden');
         }
-        
-        // Reisekosten berechnen
-        function calculateTravelExpenses() {
-            // Grunddaten abrufen
-            const purpose = document.getElementById('purpose').value;
-            const traveler = document.getElementById('traveler').value;
-            const department = document.getElementById('department').value;
-            const costCenter = document.getElementById('cost-center').value;
-            const startDate = new Date(document.getElementById('start-date').value);
-            const endDate = new Date(document.getElementById('end-date').value);
+
+        function declineCookies() {
+            localStorage.setItem('cookieConsent', 'declined');
+            document.getElementById('cookie-banner').classList.add('hidden');
+        }
+
+        // Modal Funktionen
+        function showImpressumModal() {
+            const modal = document.getElementById('legal-modal');
+            const title = document.getElementById('modal-title');
+            const content = document.getElementById('modal-content');
             
-            // Zusammenfassung aktualisieren
-            document.getElementById('summary-purpose').textContent = purpose;
-            document.getElementById('summary-traveler').textContent = traveler;
-            document.getElementById('summary-department').textContent = department;
-            document.getElementById('summary-cost-center').textContent = costCenter;
-            document.getElementById('summary-dates').textContent = `${startDate.toLocaleDateString('de-DE')} bis ${endDate.toLocaleDateString('de-DE')}`;
-            
-            if (!startDate || !endDate || startDate > endDate) {
-                alert('Bitte geben Sie ein gültiges Start- und Enddatum ein.');
-                return;
-            }
-            
-            // Tägliche Verpflegungspauschalen berechnen
-            const dailyAllowances = document.getElementById('daily-allowances');
-            dailyAllowances.innerHTML = `
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead>
-                            <tr>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Datum</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Pauschale</th>
-                                <th class="px-4 py-3 text-center text-sm font-medium text-gray-700">Frühstück (-5,60€)</th>
-                                <th class="px-4 py-3 text-center text-sm font-medium text-gray-700">Mittagessen (-11,20€)</th>
-                                <th class="px-4 py-3 text-center text-sm font-medium text-gray-700">Abendessen (-11,20€)</th>
-                                <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">Summe</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-            `;
-
-            let totalDailyAllowance = 0;
-
-            // Berechne die Anzahl der Tage
-            const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
-
-            // Für jeden Tag die Pauschale berechnen
-            for (let i = 0; i < days; i++) {
-                const currentDate = new Date(startDate);
-                currentDate.setDate(startDate.getDate() + i);
-                
-                const dateStr = currentDate.toLocaleDateString('de-DE', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit'
-                });
-
-                // Bestimme den Grundbetrag basierend auf der Reisedauer
-                let dailyAmount = 28.00; // Standardbetrag für volle Tage
-                if (i === 0 || i === days - 1) {
-                    // Erster und letzter Tag haben nur 14€ Grundbetrag
-                    dailyAmount = 14.00;
-                }
-
-                const dayId = `day-${i}`;
-                
-                dailyAllowances.querySelector('tbody').innerHTML += `
-                    <tr class="bg-white">
-                        <td class="px-4 py-3 text-sm text-gray-900">${dateStr}</td>
-                        <td class="px-4 py-3 text-sm text-gray-900">${dailyAmount.toFixed(2)} €</td>
-                        <td class="px-4 py-3 text-center">
-                            <input type="checkbox" 
-                                   id="${dayId}-breakfast" 
-                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                   onchange="calculateDailyAmount('${dayId}')">
-                        </td>
-                        <td class="px-4 py-3 text-center">
-                            <input type="checkbox" 
-                                   id="${dayId}-lunch" 
-                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                   onchange="calculateDailyAmount('${dayId}')">
-                        </td>
-                        <td class="px-4 py-3 text-center">
-                            <input type="checkbox" 
-                                   id="${dayId}-dinner" 
-                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                   onchange="calculateDailyAmount('${dayId}')">
-                        </td>
-                        <td class="px-4 py-3 text-right text-sm font-medium" id="${dayId}-total">${dailyAmount.toFixed(2)} €</td>
-                    </tr>
-                `;
-            }
-
-            dailyAllowances.innerHTML += `
-                        </tbody>
-                    </table>
-                </div>
-                <div class="bg-blue-50 p-4 rounded-lg mt-4">
-                    <div class="flex justify-between items-center">
-                        <span class="font-medium">Summe Verpflegungspauschalen:</span>
-                        <span class="font-medium text-lg" id="total-daily-allowance">0,00 €</span>
-                    </div>
+            title.textContent = 'Impressum';
+            content.innerHTML = `
+                <div class="space-y-4">
+                    <p class="text-gray-700">
+                        <strong>Angaben gemäß § 5 TMG:</strong><br>
+                        Peter Horvath<br>
+                        E-Mail: phhmburg@gmx.de<br>
+                        Telefon: 0178 6974815
+                    </p>
+                    <p class="text-gray-700">
+                        <strong>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:</strong><br>
+                        Peter Horvath
+                    </p>
                 </div>
             `;
             
-            // Transportkosten berechnen
-            const transportType = document.getElementById('transport-type').value;
-            const transportCosts = document.getElementById('transportation-costs');
-            let transportAmount = 0;
-            let transportDescription = '';
+            modal.classList.remove('hidden');
+        }
+
+        function showPrivacyModal() {
+            const modal = document.getElementById('legal-modal');
+            const title = document.getElementById('modal-title');
+            const content = document.getElementById('modal-content');
             
-            if (transportType === 'car') {
-                const distance = parseFloat(document.getElementById('distance').value) || 0;
-                transportAmount = distance * 0.30;
-                transportDescription = `PKW (${distance} km × 0,30€)`;
-            } else {
-                transportAmount = parseFloat(document.getElementById('transport-cost').value) || 0;
-                transportDescription = `${getCostTypeName(transportType)}`;
-            }
-            
-            transportCosts.innerHTML = `
-                <div class="flex justify-between items-center">
-                    <span class="text-sm">${transportDescription}</span>
-                    <span class="font-medium tabular-nums">${transportAmount.toFixed(2)}€</span>
+            title.textContent = 'Datenschutzerklärung';
+            content.innerHTML = `
+                <div class="space-y-4">
+                    <p class="text-gray-700">
+                        <strong>Datenschutz auf einen Blick</strong>
+                    </p>
+                    <p class="text-gray-700">
+                        Diese Anwendung verarbeitet alle Daten ausschließlich lokal in Ihrem Browser. Es werden keine personenbezogenen Daten an unseren Server übertragen. Die PDF-Erstellung erfolgt erst nach Ihrer Bestätigung und Zahlung.
+                    </p>
+                    <p class="text-gray-700">
+                        <strong>Cookies</strong><br>
+                        Wir verwenden nur technisch notwendige Cookies für die Funktionalität der Anwendung. Diese werden nicht für Tracking-Zwecke verwendet.
+                    </p>
+                    <p class="text-gray-700">
+                        <strong>Zahlungsabwicklung</strong><br>
+                        Für die Zahlungsabwicklung nutzen wir den Dienst Stripe. Die Datenschutzerklärung von Stripe finden Sie unter: <a href="https://stripe.com/de/privacy" class="text-blue-600 hover:text-blue-800" target="_blank">https://stripe.com/de/privacy</a>
+                    </p>
+                    <p class="text-gray-700">
+                        <strong>Ihre Rechte</strong><br>
+                        Sie haben jederzeit das Recht auf Auskunft über die zu Ihrer Person gespeicherten Daten. Da wir keine personenbezogenen Daten speichern, ist eine Auskunft nicht erforderlich.
+                    </p>
                 </div>
             `;
             
-            // Zusätzliche Kosten berechnen
-            const additionalCostsSummary = document.getElementById('additional-costs-summary');
-            let totalAdditionalCosts = 0;
-            
-            if (additionalCosts.length > 0) {
-                additionalCostsSummary.innerHTML = '';
-                additionalCosts.forEach(cost => {
-                    totalAdditionalCosts += cost.amount;
-                    const costElement = document.createElement('div');
-                    costElement.className = 'flex justify-between items-center mb-2';
-                    costElement.innerHTML = `
-                        <span class="text-sm">${getCostTypeName(cost.type)}</span>
-                        <span class="font-medium tabular-nums">${cost.amount.toFixed(2)}€</span>
-                    `;
-                    additionalCostsSummary.appendChild(costElement);
-                });
-            } else {
-                additionalCostsSummary.innerHTML = '<p class="text-sm text-gray-500" id="no-additional-costs">Keine zusätzlichen Kosten erfasst</p>';
-            }
-            
-            // Gesamtbetrag berechnen und anzeigen
-            const totalAmount = totalDailyAllowance + transportAmount + totalAdditionalCosts;
-            document.getElementById('total-amount').textContent = `${totalAmount.toFixed(2)}€`;
-            
-            // Ergebnisse anzeigen
-            document.getElementById('summary-placeholder').classList.add('hidden');
-            document.getElementById('results-container').classList.remove('hidden');
+            modal.classList.remove('hidden');
         }
 
-        // Calculate Button Event Listener
-        document.getElementById('calculate-btn').addEventListener('click', function(e) {
-            e.preventDefault(); // Verhindert das Formular-Reset
-            calculateTravelExpenses();
-        });
-
-        // Event Listener für den Export-Button
-        document.querySelector('button[onclick*="stripe.com"]').addEventListener('click', function(e) {
-            e.preventDefault();
-            showPaymentModal();
-        });
-
-        // Payment Modal anzeigen
-        function showPaymentModal() {
-            const modal = document.getElementById('payment-modal');
-            modal.style.display = 'block';
-            
-            // PayPal-Button initialisieren
-            initPayPalButton();
-            
-            // Stripe Elements initialisieren
-            initStripeElements();
+        function closeLegalModal() {
+            document.getElementById('legal-modal').classList.add('hidden');
         }
 
-        // Payment Modal schließen
-        function closePaymentModal() {
-            const modal = document.getElementById('payment-modal');
-            modal.style.display = 'none';
-        }
+        // Cookie Banner beim Laden anzeigen
+        document.addEventListener('DOMContentLoaded', showCookieBanner);
 
-        // PayPal Button initialisieren
-        function initPayPalButton() {
-            paypal.Buttons({
-                createOrder: function(data, actions) {
-                    return actions.order.create({
-                        purchase_units: [{
-                            amount: {
-                                value: '0.89',
-                                currency_code: 'EUR'
-                            }
-                        }]
-                    });
-                },
-                onApprove: function(data, actions) {
-                    return actions.order.capture().then(function(details) {
-                        handleSuccessfulPayment();
-                    });
-                }
-            }).render('#paypal-button-container');
-        }
-
-        // Stripe Elements initialisieren
-        function initStripeElements() {
-            const stripe = Stripe('pk_test_TYooMQauvdEDq54NiTphI7jx'); // Ersetzen Sie dies durch Ihren tatsächlichen Public Key
-            const elements = stripe.elements();
-            
-            const style = {
-                base: {
-                    fontSize: '16px',
-                    color: '#32325d',
-                }
-            };
-
-            const card = elements.create('card', {style: style});
-            card.mount('#card-element');
-
-            card.addEventListener('change', function(event) {
-                const displayError = document.getElementById('card-errors');
-                if (event.error) {
-                    displayError.textContent = event.error.message;
-                } else {
-                    displayError.textContent = '';
-                }
-            });
-
-            const form = document.getElementById('payment-form');
-            form.addEventListener('submit', function(event) {
-                event.preventDefault();
-
-                stripe.createPaymentMethod({
-                    type: 'card',
-                    card: card,
-                }).then(function(result) {
-                    if (result.error) {
-                        const errorElement = document.getElementById('card-errors');
-                        errorElement.textContent = result.error.message;
-                    } else {
-                        handleSuccessfulPayment();
-                    }
-                });
-            });
-        }
-
-        // Erfolgreiche Zahlung behandeln
-        function handleSuccessfulPayment() {
-            closePaymentModal();
-            generateAndDownloadPDF();
-        }
-
-        // PDF generieren und herunterladen
-        function generateAndDownloadPDF() {
-            generatePDF().then(doc => {
-                const pdfBlob = doc.output('blob');
-                const url = URL.createObjectURL(pdfBlob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = 'Reisekostenabrechnung.pdf';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-            }).catch(error => {
-                console.error('PDF-Generierung fehlgeschlagen:', error);
-                alert('Bei der PDF-Generierung ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.');
-            });
-        }
-
-        // PDF Vorschau
-        function showPdfPreview() {
-            generatePDF().then(doc => {
-                const pdfBlob = doc.output('blob');
-                const pdfUrl = URL.createObjectURL(pdfBlob);
-                
-                const preview = document.getElementById('pdf-preview');
-                const viewer = document.getElementById('pdf-viewer');
-                viewer.innerHTML = '';
-                
-                // PDF.js Vorschau
-                pdfjsLib.getDocument(pdfUrl).promise.then(function(pdf) {
-                    pdf.getPage(1).then(function(page) {
-                        const scale = 1.2;
-                        const viewport = page.getViewport({ scale: scale });
-                        
-                        const canvas = document.createElement('canvas');
-                        const context = canvas.getContext('2d');
-                        canvas.height = viewport.height;
-                        canvas.width = viewport.width;
-                        
-                        const renderContext = {
-                            canvasContext: context,
-                            viewport: viewport
-                        };
-                        
-                        page.render(renderContext).promise.then(() => {
-                            viewer.appendChild(canvas);
-                            preview.style.display = 'block';
-                        });
-                    });
-                }).catch(error => {
-                    console.error('Vorschau fehlgeschlagen:', error);
-                    alert('Die Vorschau konnte nicht geladen werden. Bitte versuchen Sie es erneut.');
-                });
-                
-                setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
-            });
-        }
-
-        // Event Listener für Schließen-Button der Vorschau
-        document.querySelector('.pdf-preview-close').addEventListener('click', function() {
-            document.getElementById('pdf-preview').style.display = 'none';
-        });
-
-        // Event Listener für Zahlungs-Tabs
-        document.getElementById('credit-card-tab').addEventListener('click', function() {
-            this.classList.add('border-b-2', 'border-blue-500', 'text-blue-600');
-            document.getElementById('paypal-tab').classList.remove('border-b-2', 'border-blue-500', 'text-blue-600');
-            document.getElementById('credit-card-form').classList.remove('hidden');
-            document.getElementById('paypal-form').classList.add('hidden');
-        });
-
-        document.getElementById('paypal-tab').addEventListener('click', function() {
-            this.classList.add('border-b-2', 'border-blue-500', 'text-blue-600');
-            document.getElementById('credit-card-tab').classList.remove('border-b-2', 'border-blue-500', 'text-blue-600');
-            document.getElementById('paypal-form').classList.remove('hidden');
-            document.getElementById('credit-card-form').classList.add('hidden');
-        });
-
-        // Schließen des Payment Modals wenn außerhalb geklickt wird
-        window.addEventListener('click', function(event) {
-            const modal = document.getElementById('payment-modal');
-            if (event.target === modal) {
-                closePaymentModal();
-            }
-        });
-
-        // Initial aufrufen
-        document.addEventListener('DOMContentLoaded', function() {
-            calculateTravelExpenses();
-            updatePriceDisplay(false);
-        });
-
-        // Stripe Konfiguration mit dem öffentlichen Schlüssel
-        const stripe = Stripe('pk_live_51RBMBxGkpOrFuebhnmgJ0yQjJ1d8GYv5WM6QcxVN5b6Uh4bdYENfniY1LCYUqkU0S8jKl25wA6JpFFi1AawyBNK20068OzrkIE');
-
-        // Stripe Kartenelemente erstellen
-        const cardNumber = elements.create('cardNumber');
-        const cardExpiry = elements.create('cardExpiry');
-        const cardCvc = elements.create('cardCvc');
-
-        // Kartenelemente mounten
-        cardNumber.mount('#card-number');
-        cardExpiry.mount('#card-expiry');
-        cardCvc.mount('#card-cvc');
-
-        // Stripe Zahlungsformular überarbeitet
-        document.getElementById('payment-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            
-            try {
-                const response = await fetch('/create-payment-intent', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        amount: 89, // 0,89€ in Cent
-                        currency: 'eur'
-                    })
-                });
-                
-                const data = await response.json();
-                
-                const { paymentIntent, error } = await stripe.confirmCardPayment(data.clientSecret, {
-                    payment_method: {
-                        card: cardNumber,
-                        billing_details: {
-                            name: document.getElementById('traveler').value
-                        }
-                    }
-                });
-                
-                if (error) {
-                    document.getElementById('payment-message').textContent = error.message;
-                    return;
-                }
-                
-                if (paymentIntent.status === 'succeeded') {
-                    document.getElementById('payment-modal').style.display = 'none';
-                    showPdfPreview(true);
-                }
-            } catch (error) {
-                console.error('Fehler bei der Zahlung:', error);
-                document.getElementById('payment-message').textContent = 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
-            }
-        });
-
-        // PDF Vorschau schließen Funktion
-        function closePdfPreview() {
-            const preview = document.getElementById('pdf-preview');
-            const viewer = document.getElementById('pdf-viewer');
-            preview.style.display = 'none';
-            viewer.innerHTML = '';
-        }
-
-        // Event Listener für Klick außerhalb der Vorschau
-        document.getElementById('pdf-preview').addEventListener('click', function(e) {
+        // Modal schließen wenn außerhalb geklickt wird
+        document.getElementById('legal-modal').addEventListener('click', function(e) {
             if (e.target === this) {
-                closePdfPreview();
+                closeLegalModal();
             }
-        });
-
-        // PDF Vorschau Funktion überarbeitet
-        async function showPdfPreview(isPaid = false) {
-            try {
-                const doc = await generatePDF();
-                const pdfBlob = doc.output('blob');
-                const pdfUrl = URL.createObjectURL(pdfBlob);
-                
-                if (isPaid) {
-                    // Wenn bezahlt, PDF herunterladen
-                    const link = document.createElement('a');
-                    link.href = pdfUrl;
-                    link.download = 'Reisekostenabrechnung.pdf';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(pdfUrl);
-                } else {
-                    // Vorschau anzeigen
-                    const preview = document.getElementById('pdf-preview');
-                    const viewer = document.getElementById('pdf-viewer');
-                    viewer.innerHTML = ''; // Vorherigen Inhalt löschen
-                    
-                    // PDF.js Vorschau
-                    const loadingTask = pdfjsLib.getDocument(pdfUrl);
-                    loadingTask.promise.then(function(pdf) {
-                        // Nur die erste Seite rendern
-                        pdf.getPage(1).then(function(page) {
-                            const scale = 1.2;
-                            const viewport = page.getViewport({ scale: scale });
-                            
-                            const canvas = document.createElement('canvas');
-                            const context = canvas.getContext('2d');
-                            canvas.height = viewport.height;
-                            canvas.width = viewport.width;
-                            
-                            const renderContext = {
-                                canvasContext: context,
-                                viewport: viewport
-                            };
-                            
-                            page.render(renderContext).promise.then(() => {
-                                viewer.innerHTML = ''; // Sicherstellen, dass der Viewer leer ist
-                                viewer.appendChild(canvas);
-                                preview.style.display = 'block';
-                                
-                                // Wasserzeichen hinzufügen
-                                const watermark = document.createElement('div');
-                                watermark.className = 'watermark';
-                                watermark.textContent = 'VORSCHAU';
-                                viewer.appendChild(watermark);
-                            });
-                        });
-                    });
-                    
-                    // URL aufräumen
-                    setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
-                }
-            } catch (error) {
-                console.error('Fehler bei der PDF-Generierung:', error);
-                alert('Bei der PDF-Generierung ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.');
-            }
-        }
-
-        // Hilfsfunktion zum Generieren des PDFs
-        async function generatePDF() {
-            // A4 Format: 210 x 297 mm
-            const doc = new jsPDF({
-                orientation: 'portrait',
-                unit: 'mm',
-                format: 'a4'
-            });
-            // Schrift und Wasserzeichen
-            doc.setFont('helvetica', 'normal');
-            doc.saveGraphicsState();
-            doc.setTextColor(220, 220, 220);
-            doc.setFontSize(54);
-            doc.text('VORSCHAU', 105, 150, {angle: 30, align: 'center', opacity: 0.07});
-            doc.restoreGraphicsState();
-            // Layout-Konstanten
-            const margin = 22;
-            const pageWidth = 210;
-            const tableWidth = 170; // Breitere Tabelle
-            const tableX = (pageWidth - tableWidth) / 2;
-            let yPos = margin;
-            // Titel
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(24);
-            doc.setTextColor(30, 41, 59);
-            doc.text('Reisekostenabrechnung', margin, yPos);
-            yPos += 12;
-            doc.setDrawColor(220,220,220);
-            doc.setLineWidth(1);
-            doc.line(margin, yPos, pageWidth - margin, yPos);
-            yPos += 8;
-            // Grunddaten
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(12);
-            doc.setTextColor(60,60,60);
-            const purpose = document.getElementById('purpose').value;
-            const traveler = document.getElementById('traveler').value;
-            const department = document.getElementById('department').value;
-            const costCenter = document.getElementById('cost-center').value;
-            const startDate = new Date(document.getElementById('start-date').value);
-            const endDate = new Date(document.getElementById('end-date').value);
-            const col1X = margin;
-            const col2X = margin + 70;
-            doc.text('Reisender:', col1X, yPos);
-            doc.text(traveler, col1X + 32, yPos);
-            doc.text('Abteilung:', col2X, yPos);
-            doc.text(department, col2X + 32, yPos);
-            yPos += 7.5;
-            doc.text('Kostenträger:', col1X, yPos);
-            doc.text(costCenter, col1X + 32, yPos);
-            doc.text('Reisezweck:', col2X, yPos);
-            doc.text(purpose, col2X + 32, yPos);
-            yPos += 7.5;
-            doc.text('Zeitraum:', col1X, yPos);
-            doc.text(`${startDate.toLocaleDateString('de-DE')} bis ${endDate.toLocaleDateString('de-DE')}`, col1X + 32, yPos);
-            yPos += 16;
-            // Abschnitt: Verpflegungspauschalen
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(15);
-            doc.setTextColor(44, 98, 180);
-            doc.text('Verpflegungspauschalen', tableX, yPos);
-            yPos += 11;
-            // Tabelle Kopf
-            const tableHeaders = [
-                { title: 'Datum', width: 44 },
-                { title: 'Pauschale', width: 28 },
-                { title: 'Frühstück', width: 26 },
-                { title: 'Mittag', width: 26 },
-                { title: 'Abend', width: 26 },
-                { title: 'Summe', width: 28 }
-            ];
-            doc.setFillColor(235, 241, 250);
-            doc.setDrawColor(200,200,200);
-            doc.setTextColor(44, 98, 180);
-            doc.roundedRect(tableX, yPos, tableWidth, 12, 3, 3, 'F');
-            let xPos = tableX + 4;
-            doc.setFontSize(12);
-            tableHeaders.forEach(header => {
-                doc.text(header.title, xPos, yPos + 8, {maxWidth: header.width-2});
-                xPos += header.width;
-            });
-            yPos += 12;
-            // Tabelle Inhalt
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(11);
-            doc.setTextColor(60,60,60);
-            let totalAllowance = 0;
-            const rows = document.querySelectorAll('#daily-allowances tbody tr');
-            rows.forEach((row, index) => {
-                doc.setFillColor(index % 2 === 0 ? 255 : 245, 247, 250);
-                doc.roundedRect(tableX, yPos, tableWidth, 11, 2, 2, 'F');
-                xPos = tableX + 4;
-                doc.text(row.cells[0].textContent, xPos, yPos + 7.5, {maxWidth: tableHeaders[0].width-2});
-                xPos += tableHeaders[0].width;
-                doc.text(`${parseFloat(row.cells[1].textContent).toFixed(2)} €`, xPos, yPos + 7.5, {maxWidth: tableHeaders[1].width-2});
-                xPos += tableHeaders[1].width;
-                // Checkboxen für Mahlzeiten
-                const meals = [
-                    row.cells[2].querySelector('input').checked,
-                    row.cells[3].querySelector('input').checked,
-                    row.cells[4].querySelector('input').checked
-                ];
-                meals.forEach((meal, i) => {
-                    if (meal) {
-                        doc.text('✓', xPos + tableHeaders[2+i].width/2-2, yPos + 7.5, {align: 'center'});
-                    }
-                    xPos += tableHeaders[2+i].width;
-                });
-                const amount = parseFloat(row.cells[5].textContent);
-                doc.text(`${amount.toFixed(2)} €`, xPos, yPos + 7.5, {maxWidth: tableHeaders[5].width-2});
-                totalAllowance += amount;
-                yPos += 11;
-            });
-            // Summe Verpflegungspauschalen
-            yPos += 3;
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(12);
-            doc.setTextColor(255,255,255);
-            doc.setFillColor(44, 98, 180);
-            doc.roundedRect(tableX, yPos, tableWidth, 11, 2, 2, 'F');
-            doc.text('Summe Verpflegungspauschalen:', tableX + 4, yPos + 7.5);
-            doc.text(`${totalAllowance.toFixed(2)} €`, tableX + tableWidth - 32, yPos + 7.5);
-            yPos += 16;
-            // Abschnitt: Transportkosten
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(15);
-            doc.setTextColor(44, 98, 180);
-            doc.text('Transportkosten', tableX, yPos);
-            yPos += 11;
-            // Tabelle Kopf
-            doc.setFillColor(235, 241, 250);
-            doc.setDrawColor(200,200,200);
-            doc.setTextColor(44, 98, 180);
-            doc.roundedRect(tableX, yPos, tableWidth, 12, 3, 3, 'F');
-            doc.text('Art', tableX + 4, yPos + 8);
-            doc.text('Betrag', tableX + tableWidth - 32, yPos + 8);
-            yPos += 12;
-            // Transport Details
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(11);
-            doc.setTextColor(60,60,60);
-            const transportAmount = calculateTransportCosts();
-            doc.setFillColor(255,255,255);
-            doc.roundedRect(tableX, yPos, tableWidth, 11, 2, 2, 'F');
-            doc.text(getTransportDescription(), tableX + 4, yPos + 7.5);
-            doc.text(`${transportAmount.toFixed(2)} €`, tableX + tableWidth - 32, yPos + 7.5);
-            yPos += 16;
-            // Abschnitt: Zusätzliche Kosten
-            if (additionalCosts.length > 0) {
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(15);
-                doc.setTextColor(44, 98, 180);
-                doc.text('Zusätzliche Kosten', tableX, yPos);
-                yPos += 11;
-                doc.setFillColor(235, 241, 250);
-                doc.setDrawColor(200,200,200);
-                doc.setTextColor(44, 98, 180);
-                doc.roundedRect(tableX, yPos, tableWidth, 12, 3, 3, 'F');
-                doc.text('Art', tableX + 4, yPos + 8);
-                doc.text('Betrag', tableX + tableWidth - 32, yPos + 8);
-                yPos += 12;
-                doc.setFont('helvetica', 'normal');
-                doc.setFontSize(11);
-                doc.setTextColor(60,60,60);
-                additionalCosts.forEach((cost, index) => {
-                    doc.setFillColor(index % 2 === 0 ? 255 : 245, 247, 250);
-                    doc.roundedRect(tableX, yPos, tableWidth, 11, 2, 2, 'F');
-                    doc.text(getCostTypeName(cost.type), tableX + 4, yPos + 7.5);
-                    doc.text(`${cost.amount.toFixed(2)} €`, tableX + tableWidth - 32, yPos + 7.5);
-                    yPos += 11;
-                });
-                yPos += 3;
-            }
-            // Gesamtsumme als Highlight-Box
-            const totalAmount = totalAllowance + transportAmount + additionalCosts.reduce((sum, cost) => sum + cost.amount, 0);
-            yPos = Math.min(yPos + 10, 250);
-            doc.setFillColor(44, 98, 180);
-            doc.setTextColor(255,255,255);
-            doc.roundedRect(tableX, yPos, tableWidth, 15, 3, 3, 'F');
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(16);
-            doc.text('Gesamtbetrag:', tableX + 8, yPos + 10);
-            doc.text(`${totalAmount.toFixed(2)} €`, tableX + tableWidth - 36, yPos + 10);
-            // Unterschriftsbereich
-            yPos = 270;
-            doc.setDrawColor(220,220,220);
-            doc.setLineWidth(0.5);
-            doc.line(margin, yPos, margin + 70, yPos);
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(11);
-            doc.setTextColor(120,120,120);
-            doc.text('Ort, Datum', margin, yPos + 5.5);
-            doc.line(pageWidth - margin - 70, yPos, pageWidth - margin, yPos);
-            doc.text('Unterschrift Antragsteller/in', pageWidth - margin - 70, yPos + 5.5);
-            yPos += 18;
-            doc.line(pageWidth - margin - 70, yPos, pageWidth - margin, yPos);
-            doc.text('Unterschrift Genehmiger/in', pageWidth - margin - 70, yPos + 5.5);
-            return doc;
-        }
-
-        // Hilfsfunktion für die Transportkostenbeschreibung
-        function getTransportDescription() {
-            const transportType = document.getElementById('transport-type').value;
-            const distance = document.getElementById('distance').value;
-            const transportCost = document.getElementById('transport-cost').value;
-            
-            if (transportType === 'car') {
-                return `PKW (${distance} km × 0,30€)`;
-            } else {
-                return `${getCostTypeName(transportType)} ${transportCost}`;
-            }
-        }
-
-        // Hilfsfunktion für die Transportkostenberechnung
-        function calculateTransportCosts() {
-            const transportType = document.getElementById('transport-type').value;
-            if (transportType === 'car') {
-                const distance = parseFloat(document.getElementById('distance').value) || 0;
-                return distance * 0.30;
-            } else {
-                return parseFloat(document.getElementById('transport-cost').value) || 0;
-            }
-        }
-
-        // Funktion zum Berechnen der Tagespauschale
-        function calculateDailyAmount(dayId) {
-            const breakfastChecked = document.getElementById(`${dayId}-breakfast`).checked;
-            const lunchChecked = document.getElementById(`${dayId}-lunch`).checked;
-            const dinnerChecked = document.getElementById(`${dayId}-dinner`).checked;
-            
-            // Bestimme den Tag-Index aus der ID
-            const dayIndex = parseInt(dayId.split('-')[1]);
-            
-            // Bestimme die Anzahl der Tage
-            const startDate = new Date(document.getElementById('start-date').value);
-            const endDate = new Date(document.getElementById('end-date').value);
-            const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
-            
-            // Setze Grundbetrag basierend auf ersten/letzten Tag
-            const baseAmount = (dayIndex === 0 || dayIndex === days - 1) ? 14.00 : 28.00;
-            
-            // Abzüge berechnen
-            let deductions = 0;
-            if (breakfastChecked) deductions += 5.60;
-            if (lunchChecked) deductions += 11.20;
-            if (dinnerChecked) deductions += 11.20;
-            
-            // Endbetrag berechnen (nicht weniger als 0)
-            const finalAmount = Math.max(0, baseAmount - deductions);
-            
-            // Tagesbetrag aktualisieren
-            document.getElementById(`${dayId}-total`).textContent = `${finalAmount.toFixed(2)} €`;
-            
-            // Gesamtsumme aktualisieren
-            updateTotalDailyAllowance();
-        }
-
-        // Funktion zum Aktualisieren der Gesamtsumme der Verpflegungspauschalen
-        function updateTotalDailyAllowance() {
-            let total = 0;
-            
-            // Alle Tagesbeträge aufsummieren
-            const dailyTotals = document.querySelectorAll('[id$="-total"]');
-            dailyTotals.forEach(element => {
-                const amountText = element.textContent;
-                const amount = parseFloat(amountText.replace('€', '').trim());
-                if (!isNaN(amount)) {
-                    total += amount;
-                }
-            });
-            
-            // Summe in der Tabelle aktualisieren
-            document.getElementById('total-daily-allowance').textContent = `${total.toFixed(2)} €`;
-            
-            // Summe in der Zusammenfassung aktualisieren
-            document.getElementById('summary-allowances').textContent = `${total.toFixed(2)} €`;
-            
-            // Gesamtbetrag aktualisieren
-            updateTotalAmount();
-        }
-
-        // Funktion zum Aktualisieren des Gesamtbetrags
-        function updateTotalAmount() {
-            const allowancesText = document.getElementById('summary-allowances').textContent;
-            const allowancesAmount = parseFloat(allowancesText.replace('€', '').trim()) || 0;
-            
-            const transportText = document.getElementById('transportation-costs').textContent;
-            const transportAmount = parseFloat(transportText.replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
-            
-            const additionalTotal = additionalCosts.reduce((sum, cost) => sum + cost.amount, 0);
-            
-            const total = allowancesAmount + transportAmount + additionalTotal;
-            document.getElementById('total-amount').textContent = `${total.toFixed(2)}€`;
-        }
-
-        // Event Listener für die Datumseingaben
-        document.getElementById('start-date').addEventListener('change', updateMealTable);
-        document.getElementById('end-date').addEventListener('change', updateMealTable);
-
-        // Rechte Spalte (Zusammenfassung) aktualisieren
-        function updateSummary() {
-            const purpose = document.getElementById('purpose').value;
-            const traveler = document.getElementById('traveler').value;
-            const department = document.getElementById('department').value;
-            const costCenter = document.getElementById('cost-center').value;
-            const startDate = new Date(document.getElementById('start-date').value);
-            const endDate = new Date(document.getElementById('end-date').value);
-            
-            document.getElementById('summary-purpose').textContent = purpose;
-            document.getElementById('summary-traveler').textContent = traveler;
-            document.getElementById('summary-department').textContent = department;
-            document.getElementById('summary-cost-center').textContent = costCenter;
-            document.getElementById('summary-dates').textContent = startDate && endDate ? 
-                `${startDate.toLocaleDateString('de-DE')} bis ${endDate.toLocaleDateString('de-DE')}` : '';
-        }
-
-        // Event Listener für alle Eingabefelder
-        document.querySelectorAll('input, select').forEach(element => {
-            element.addEventListener('change', updateSummary);
         });
     </script>
 </body>
