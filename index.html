@@ -653,48 +653,6 @@
         </div>
     </div>
 
-    <!-- Payment Modal -->
-    <div id="payment-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
-        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-full max-w-md">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold text-gray-800">PDF-Export (0,89€)</h2>
-                <button onclick="closePaymentModal()" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <!-- Zahlungsmethoden Tabs -->
-            <div class="mb-6">
-                <div class="flex border-b border-gray-200">
-                    <button id="credit-card-tab" class="py-2 px-4 border-b-2 border-blue-500 text-blue-600 font-medium">
-                        Kreditkarte
-                    </button>
-                    <button id="paypal-tab" class="py-2 px-4 text-gray-500 font-medium">
-                        PayPal
-                    </button>
-                </div>
-            </div>
-
-            <!-- Kreditkartenformular -->
-            <div id="credit-card-form">
-                <form id="payment-form" class="space-y-4">
-                    <div class="rounded-md shadow-sm -space-y-px">
-                        <div id="card-element" class="bg-white p-3 border rounded-md"></div>
-                    </div>
-                    <div id="card-errors" class="text-red-600 text-sm mt-2"></div>
-                    <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
-                        Jetzt bezahlen (0,89€)
-                    </button>
-                </form>
-            </div>
-
-            <!-- PayPal Button -->
-            <div id="paypal-form" class="hidden">
-                <div id="paypal-button-container"></div>
-            </div>
-        </div>
-    </div>
-
     <!-- PDF Vorschau Modal -->
     <div class="pdf-preview" id="pdf-preview">
         <div class="pdf-preview-content">
@@ -876,6 +834,226 @@
                 closeLegalModal();
             }
         });
+
+        // --- BERECHNUNGS- UND ZUSAMMENFASSUNGSLOGIK ---
+        let additionalCosts = [];
+
+        // Kostenliste aktualisieren
+        function updateCostsList() {
+            const costsList = document.getElementById('costs-list');
+            costsList.innerHTML = '';
+            if (additionalCosts.length === 0) return;
+            additionalCosts.forEach(cost => {
+                const costElement = document.createElement('div');
+                costElement.className = 'flex items-center justify-between bg-gray-50 p-2 rounded';
+                costElement.innerHTML = `
+                    <div>
+                        <span class="text-sm font-medium">${getCostTypeName(cost.type)}</span>
+                        <span class="text-sm text-gray-600 ml-2">${cost.amount.toFixed(2)} €</span>
+                    </div>
+                    <button class="delete-cost-btn text-red-500 hover:text-red-700" data-id="${cost.id}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                costsList.appendChild(costElement);
+            });
+            document.querySelectorAll('.delete-cost-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const costId = parseInt(this.getAttribute('data-id'));
+                    additionalCosts = additionalCosts.filter(cost => cost.id !== costId);
+                    updateCostsList();
+                });
+            });
+        }
+        function getCostTypeName(type) {
+            const types = {
+                'accommodation': 'Übernachtung',
+                'parking': 'Parkgebühren',
+                'taxi': 'Taxi',
+                'tickets': 'Tickets',
+                'other': 'Sonstiges'
+            };
+            return types[type] || type;
+        }
+        // Event Listener für Kosten hinzufügen
+        if (document.querySelector('.add-cost-btn')) {
+            document.querySelector('.add-cost-btn').addEventListener('click', function() {
+                const costType = document.querySelector('.cost-type').value;
+                const costAmount = parseFloat(document.querySelector('.cost-amount').value);
+                if (isNaN(costAmount) || costAmount <= 0) {
+                    alert('Bitte geben Sie einen gültigen Betrag ein');
+                    return;
+                }
+                const costId = Date.now();
+                additionalCosts.push({ id: costId, type: costType, amount: costAmount });
+                updateCostsList();
+                document.querySelector('.cost-amount').value = '';
+            });
+        }
+        // Berechnung der Reisekosten
+        function calculateTravelExpenses() {
+            // Grunddaten abrufen
+            const purpose = document.getElementById('purpose').value;
+            const traveler = document.getElementById('traveler').value;
+            const department = document.getElementById('department').value;
+            const costCenter = document.getElementById('cost-center').value;
+            const startDate = new Date(document.getElementById('start-date').value);
+            const endDate = new Date(document.getElementById('end-date').value);
+            document.getElementById('summary-purpose').textContent = purpose;
+            document.getElementById('summary-traveler').textContent = traveler;
+            document.getElementById('summary-department').textContent = department;
+            document.getElementById('summary-cost-center').textContent = costCenter;
+            document.getElementById('summary-dates').textContent = `${startDate.toLocaleDateString('de-DE')} bis ${endDate.toLocaleDateString('de-DE')}`;
+            if (!startDate || !endDate || startDate > endDate) {
+                alert('Bitte geben Sie ein gültiges Start- und Enddatum ein.');
+                return;
+            }
+            // Tägliche Verpflegungspauschalen berechnen
+            const dailyAllowances = document.getElementById('daily-allowances');
+            dailyAllowances.innerHTML = `
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Datum</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Pauschale</th>
+                                <th class="px-4 py-3 text-center text-sm font-medium text-gray-700">Frühstück (-5,60€)</th>
+                                <th class="px-4 py-3 text-center text-sm font-medium text-gray-700">Mittagessen (-11,20€)</th>
+                                <th class="px-4 py-3 text-center text-sm font-medium text-gray-700">Abendessen (-11,20€)</th>
+                                <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">Summe</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+            `;
+            let totalDailyAllowance = 0;
+            const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+            for (let i = 0; i < days; i++) {
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + i);
+                const dateStr = currentDate.toLocaleDateString('de-DE', {
+                    weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit'
+                });
+                let dailyAmount = 28.00;
+                if (i === 0 || i === days - 1) dailyAmount = 14.00;
+                const dayId = `day-${i}`;
+                dailyAllowances.querySelector('tbody').innerHTML += `
+                    <tr class="bg-white">
+                        <td class="px-4 py-3 text-sm text-gray-900">${dateStr}</td>
+                        <td class="px-4 py-3 text-sm text-gray-900">${dailyAmount.toFixed(2)} €</td>
+                        <td class="px-4 py-3 text-center">
+                            <input type="checkbox" id="${dayId}-breakfast" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" onchange="calculateDailyAmount('${dayId}')">
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            <input type="checkbox" id="${dayId}-lunch" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" onchange="calculateDailyAmount('${dayId}')">
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            <input type="checkbox" id="${dayId}-dinner" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" onchange="calculateDailyAmount('${dayId}')">
+                        </td>
+                        <td class="px-4 py-3 text-right text-sm font-medium" id="${dayId}-total">${dailyAmount.toFixed(2)} €</td>
+                    </tr>
+                `;
+            }
+            dailyAllowances.innerHTML += `
+                        </tbody>
+                    </table>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg mt-4">
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium">Summe Verpflegungspauschalen:</span>
+                        <span class="font-medium text-lg" id="total-daily-allowance">0,00 €</span>
+                    </div>
+                </div>
+            `;
+            // Transportkosten berechnen
+            const transportType = document.getElementById('transport-type').value;
+            const transportCosts = document.getElementById('transportation-costs');
+            let transportAmount = 0;
+            let transportDescription = '';
+            if (transportType === 'car') {
+                const distance = parseFloat(document.getElementById('distance').value) || 0;
+                transportAmount = distance * 0.30;
+                transportDescription = `PKW (${distance} km × 0,30€)`;
+            } else {
+                transportAmount = parseFloat(document.getElementById('transport-cost').value) || 0;
+                transportDescription = `${getCostTypeName(transportType)}`;
+            }
+            transportCosts.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <span class="text-sm">${transportDescription}</span>
+                    <span class="font-medium tabular-nums">${transportAmount.toFixed(2)}€</span>
+                </div>
+            `;
+            // Zusätzliche Kosten berechnen
+            const additionalCostsSummary = document.getElementById('additional-costs-summary');
+            let totalAdditionalCosts = 0;
+            if (additionalCosts.length > 0) {
+                additionalCostsSummary.innerHTML = '';
+                additionalCosts.forEach(cost => {
+                    totalAdditionalCosts += cost.amount;
+                    const costElement = document.createElement('div');
+                    costElement.className = 'flex justify-between items-center mb-2';
+                    costElement.innerHTML = `
+                        <span class="text-sm">${getCostTypeName(cost.type)}</span>
+                        <span class="font-medium tabular-nums">${cost.amount.toFixed(2)}€</span>
+                    `;
+                    additionalCostsSummary.appendChild(costElement);
+                });
+            } else {
+                additionalCostsSummary.innerHTML = '<p class="text-sm text-gray-500" id="no-additional-costs">Keine zusätzlichen Kosten erfasst</p>';
+            }
+            // Gesamtbetrag berechnen und anzeigen
+            const totalAmount = totalDailyAllowance + transportAmount + totalAdditionalCosts;
+            document.getElementById('total-amount').textContent = `${totalAmount.toFixed(2)}€`;
+            // Ergebnisse anzeigen
+            document.getElementById('summary-placeholder').classList.add('hidden');
+            document.getElementById('results-container').classList.remove('hidden');
+        }
+        // Tagespauschale berechnen
+        function calculateDailyAmount(dayId) {
+            const breakfastChecked = document.getElementById(`${dayId}-breakfast`).checked;
+            const lunchChecked = document.getElementById(`${dayId}-lunch`).checked;
+            const dinnerChecked = document.getElementById(`${dayId}-dinner`).checked;
+            const dayIndex = parseInt(dayId.split('-')[1]);
+            const startDate = new Date(document.getElementById('start-date').value);
+            const endDate = new Date(document.getElementById('end-date').value);
+            const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+            const baseAmount = (dayIndex === 0 || dayIndex === days - 1) ? 14.00 : 28.00;
+            let deductions = 0;
+            if (breakfastChecked) deductions += 5.60;
+            if (lunchChecked) deductions += 11.20;
+            if (dinnerChecked) deductions += 11.20;
+            const finalAmount = Math.max(0, baseAmount - deductions);
+            document.getElementById(`${dayId}-total`).textContent = `${finalAmount.toFixed(2)} €`;
+            updateTotalDailyAllowance();
+        }
+        function updateTotalDailyAllowance() {
+            let total = 0;
+            const dailyTotals = document.querySelectorAll('[id$="-total"]');
+            dailyTotals.forEach(element => {
+                const amountText = element.textContent;
+                const amount = parseFloat(amountText.replace('€', '').trim());
+                if (!isNaN(amount)) total += amount;
+            });
+            document.getElementById('total-daily-allowance').textContent = `${total.toFixed(2)} €`;
+            document.getElementById('summary-allowances').textContent = `${total.toFixed(2)} €`;
+            updateTotalAmount();
+        }
+        function updateTotalAmount() {
+            const allowancesText = document.getElementById('summary-allowances').textContent;
+            const allowancesAmount = parseFloat(allowancesText.replace('€', '').trim()) || 0;
+            const transportText = document.getElementById('transportation-costs').textContent;
+            const transportAmount = parseFloat(transportText.replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
+            const additionalTotal = additionalCosts.reduce((sum, cost) => sum + cost.amount, 0);
+            const total = allowancesAmount + transportAmount + additionalTotal;
+            document.getElementById('total-amount').textContent = `${total.toFixed(2)}€`;
+        }
+        // Event Listener für Berechnen-Button
+        if (document.getElementById('calculate-btn')) {
+            document.getElementById('calculate-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                calculateTravelExpenses();
+            });
+        }
     </script>
 </body>
-</html>
+</html
