@@ -1084,6 +1084,52 @@
                 }
             });
         }
+
+        // PDF-Generierung und Vorschau
+        function generatePDF() {
+            // Beispielhafte PDF-Erstellung mit jsPDF
+            const doc = new window.jspdf.jsPDF();
+            doc.setFontSize(18);
+            doc.text('Reisekostenabrechnung', 14, 20);
+            doc.setFontSize(12);
+            doc.text('Erstellt mit reisekostenapp.vercel.app', 14, 30);
+            // Hier können weitere Inhalte (z.B. Zusammenfassung, Beträge) ergänzt werden
+            doc.text('--- Zusammenfassung ---', 14, 40);
+            doc.text(document.getElementById('total-amount').textContent || '', 14, 50);
+            // ... weitere Felder nach Bedarf ...
+            return doc;
+        }
+
+        function generateAndDownloadPDF() {
+            const doc = generatePDF();
+            doc.save('Reisekostenabrechnung.pdf');
+        }
+
+        function showPdfPreview() {
+            const doc = generatePDF();
+            const pdfData = doc.output('blob');
+            const url = URL.createObjectURL(pdfData);
+            const viewer = document.getElementById('pdf-viewer');
+            viewer.innerHTML = '';
+            const loadingTask = window.pdfjsLib.getDocument(url);
+            loadingTask.promise.then(function(pdf) {
+                pdf.getPage(1).then(function(page) {
+                    const scale = 1.2;
+                    const viewport = page.getViewport({ scale: scale });
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    viewer.appendChild(canvas);
+                    page.render({ canvasContext: context, viewport: viewport });
+                });
+            });
+            document.getElementById('pdf-preview').style.display = 'block';
+        }
+
+        function closePdfPreview() {
+            document.getElementById('pdf-preview').style.display = 'none';
+        }
     </script>
 </body>
 </html
