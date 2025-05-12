@@ -1087,7 +1087,8 @@
 
         // PDF-Generierung und Vorschau
         function formatEuro(amount) {
-            return amount.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
+            // Geschütztes Leerzeichen vor €
+            return amount.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '\u202f€';
         }
 
         function generatePDF() {
@@ -1101,19 +1102,23 @@
             const borderGray = [204, 204, 204];
             const blue = [26, 115, 232];
             doc.setFont('helvetica', '');
-            // Optional: Rahmen um das Formular
+            // Rahmen um das Formular
             doc.setDrawColor(...borderGray);
             doc.setLineWidth(0.7);
             doc.roundedRect(margin-2, margin-2, contentWidth+4, 257, 3, 3, 'S');
             // Titel
-            doc.setFontSize(22);
+            doc.setFontSize(26);
             doc.setFont(undefined, 'bold');
-            doc.text('Reisekostenabrechnung', pageWidth/2, margin+8, {align: 'center'});
+            doc.text('Reisekostenabrechnung', pageWidth/2, margin+10, {align: 'center'});
             doc.setFont(undefined, 'normal');
+            // Dünne Linie unter Titel
+            doc.setDrawColor(200,200,200);
+            doc.setLineWidth(0.5);
+            doc.line(margin, margin+14, pageWidth-margin, margin+14);
             // Kopfbereich
-            let y = margin+18;
+            let y = margin+20;
             doc.setFillColor(...headerGray);
-            doc.rect(margin, y, contentWidth, 28, 'F');
+            doc.roundedRect(margin, y, contentWidth, 34, 3, 3, 'F');
             doc.setFontSize(12);
             doc.setTextColor(60,60,60);
             let traveler = document.getElementById('traveler').value || '';
@@ -1137,14 +1142,15 @@
                 `Zeitraum: ${zeitraum}`,
                 `Transportmittel: ${transportType}`
             ];
-            let yKopf = y+7;
+            let yKopf = y+8;
             kopfzeilen.forEach(line => {
-                doc.text(line, margin+4, yKopf);
-                yKopf += 4.5;
+                doc.text(line, margin+6, yKopf);
+                yKopf += 4.8;
             });
-            y = y+28+6;
+            y = y+34+10;
             // Tabelle 1: Verpflegungspauschalen
             let dailyRows = [];
+            let totalAllowances = 0;
             if (startDate && endDate) {
                 const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
                 for (let i = 0; i < days; i++) {
@@ -1160,6 +1166,7 @@
                     if (lunch) deductions += 11.20;
                     if (dinner) deductions += 11.20;
                     const finalAmount = Math.max(0, baseAmount - deductions);
+                    totalAllowances += finalAmount;
                     let deductionText = [];
                     if (breakfast) deductionText.push('Frühstück');
                     if (lunch) deductionText.push('Mittagessen');
@@ -1167,26 +1174,31 @@
                     dailyRows.push([
                         dateStr,
                         formatEuro(baseAmount),
-                        deductionText.join(', '),
+                        deductionText.length ? deductionText.join(', ') : '–',
                         formatEuro(finalAmount)
                     ]);
                 }
                 doc.autoTable({
                     startY: y,
-                    head: [['Datum', 'Pauschale', 'Kürzungen', 'Summe']],
+                    head: [['Datum', 'Pauschale', 'Kürzungen (ggf.)', 'Summe']],
                     body: dailyRows,
                     theme: 'grid',
-                    styles: {fontSize: 11, cellPadding: 3.5, lineColor: borderGray, lineWidth: 0.3, valign: 'middle'},
+                    styles: {fontSize: 11, cellPadding: 3.8, lineColor: borderGray, lineWidth: 0.3, valign: 'middle', halign: 'left'},
                     headStyles: {fillColor: lightGray, textColor: 60, fontStyle: 'bold'},
                     alternateRowStyles: {fillColor: [255,255,255]},
+                    columnStyles: {1: {halign: 'right'}, 2: {halign: 'center'}, 3: {halign: 'right'}},
                     margin: {left: margin, right: margin},
                     tableWidth: contentWidth,
+                    didDrawCell: function (data) {
+                        if (data.section === 'body' && data.column.index === 3) {
+                            doc.setFont(undefined, 'bold');
+                        }
+                    }
                 });
-                y = doc.lastAutoTable.finalY + 8;
+                y = doc.lastAutoTable.finalY + 12;
             }
             // Tabelle 2: Einzelpositionen
             let transport = document.getElementById('transportation-costs').textContent || '0,00 €';
-            let allowances = document.getElementById('summary-allowances').textContent || '0,00 €';
             let additionalRows = [];
             const additionalCostsSummary = document.getElementById('additional-costs-summary');
             if (additionalCostsSummary) {
@@ -1200,43 +1212,52 @@
             }
             let overnight = additionalRows.filter(r => r[0].includes('Übernachtung')).reduce((sum, r) => sum + parseFloat((r[1]||'0').replace(',','.')), 0);
             let transportVal = parseFloat((transport.match(/[\d,.]+/)||['0'])[0].replace(',','.'));
-            let allowancesVal = parseFloat((allowances.match(/[\d,.]+/)||['0'])[0].replace(',','.'));
-            let total = document.getElementById('total-amount').textContent || '0,00 €';
             let posRows = [
                 ['Fahrtkosten', transportType, formatEuro(transportVal)],
-                ['Verpflegungspauschalen', '', formatEuro(allowancesVal)],
+                ['Verpflegungspauschalen', '', formatEuro(totalAllowances)],
                 ['Übernachtungskosten', '', formatEuro(overnight)]
             ];
             posRows = posRows.concat(
                 additionalRows.filter(r => !r[0].includes('Übernachtung')).map(r => ['Nebenkosten', r[0], r[1]])
             );
+            // Gesamtbetrag korrekt berechnen
+            let total = transportVal + totalAllowances + overnight;
+            additionalRows.filter(r => !r[0].includes('Übernachtung')).forEach(r => {
+                total += parseFloat((r[1]||'0').replace(',','.'));
+            });
             doc.autoTable({
                 startY: y,
-                head: [['Position', 'Beschreibung', 'Betrag (€)']],
+                head: [['Position', 'Beschreibung', 'Betrag (\u202f€)']],
                 body: posRows,
                 theme: 'grid',
-                styles: {fontSize: 11, cellPadding: 3.5, lineColor: borderGray, lineWidth: 0.3, valign: 'middle'},
+                styles: {fontSize: 11, cellPadding: 4.2, lineColor: borderGray, lineWidth: 0.3, valign: 'middle', halign: 'left'},
                 headStyles: {fillColor: lightGray, textColor: 60, fontStyle: 'bold'},
                 alternateRowStyles: {fillColor: [255,255,255]},
+                columnStyles: {2: {halign: 'right'}},
                 margin: {left: margin, right: margin},
                 tableWidth: contentWidth,
+                didDrawCell: function (data) {
+                    if (data.section === 'body' && data.column.index === 2) {
+                        doc.setFont(undefined, 'bold');
+                    }
+                }
             });
-            y = doc.lastAutoTable.finalY + 8;
+            y = doc.lastAutoTable.finalY + 14;
             // Gesamtbetrag
-            doc.setFontSize(14);
+            doc.setFontSize(15);
             doc.setTextColor(...blue);
             doc.setFont(undefined, 'bold');
-            doc.text(`Gesamtbetrag: ${total.replace('.', ',')}`, margin, y);
+            doc.text(`Gesamtbetrag: ${formatEuro(total)}`, margin, y);
             doc.setFont(undefined, 'normal');
             doc.setTextColor(0,0,0);
-            y += 16;
+            y += 22;
             // Abschlussbereich
             doc.setLineWidth(0.3);
-            doc.line(margin, y, margin+80, y);
-            doc.setFontSize(11);
-            doc.text('Ort, Datum, Unterschrift:', margin, y-1.5);
+            doc.line(margin+5, y, margin+85, y);
+            doc.setFontSize(12);
+            doc.text('Ort, Datum, Unterschrift:', margin+5, y-2.5);
             y += 10;
-            if(applicantName) doc.text(`Antragsteller: ${applicantName}`, margin, y);
+            if(applicantName) doc.text(`Antragsteller: ${applicantName}`, margin+5, y);
             return doc;
         }
 
