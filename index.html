@@ -1211,6 +1211,66 @@
         function closePdfPreview() {
             document.getElementById('pdf-preview').style.display = 'none';
         }
+
+        // --- FORMULARDATEN SPEICHERN UND LADEN ---
+        function saveFormDataToLocalStorage() {
+            const data = {
+                purpose: document.getElementById('purpose').value,
+                traveler: document.getElementById('traveler').value,
+                department: document.getElementById('department').value,
+                costCenter: document.getElementById('cost-center').value,
+                startDate: document.getElementById('start-date').value,
+                endDate: document.getElementById('end-date').value,
+                transportType: document.getElementById('transport-type').value,
+                distance: document.getElementById('distance').value,
+                transportCost: document.getElementById('transport-cost').value,
+                applicantName: document.getElementById('applicant-name').value,
+                approverName: document.getElementById('approver-name').value,
+                additionalCosts: window.additionalCosts || []
+            };
+            localStorage.setItem('travelFormData', JSON.stringify(data));
+        }
+
+        function loadFormDataFromLocalStorage() {
+            const data = JSON.parse(localStorage.getItem('travelFormData') || '{}');
+            if (!data) return;
+            if (data.purpose) document.getElementById('purpose').value = data.purpose;
+            if (data.traveler) document.getElementById('traveler').value = data.traveler;
+            if (data.department) document.getElementById('department').value = data.department;
+            if (data.costCenter) document.getElementById('cost-center').value = data.costCenter;
+            if (data.startDate) document.getElementById('start-date').value = data.startDate;
+            if (data.endDate) document.getElementById('end-date').value = data.endDate;
+            if (data.transportType) document.getElementById('transport-type').value = data.transportType;
+            if (data.distance) document.getElementById('distance').value = data.distance;
+            if (data.transportCost) document.getElementById('transport-cost').value = data.transportCost;
+            if (data.applicantName) document.getElementById('applicant-name').value = data.applicantName;
+            if (data.approverName) document.getElementById('approver-name').value = data.approverName;
+            if (Array.isArray(data.additionalCosts)) {
+                window.additionalCosts = data.additionalCosts;
+                updateCostsList();
+            }
+        }
+
+        function clearFormDataFromLocalStorage() {
+            localStorage.removeItem('travelFormData');
+        }
+
+        // Stripe-Button: Daten speichern
+        const stripeBtn = document.querySelector('button[onclick*="stripe.com"]');
+        if (stripeBtn) {
+            stripeBtn.addEventListener('click', saveFormDataToLocalStorage);
+        }
+
+        // Nach Rückleitung: Daten laden und nach PDF-Download löschen
+        if (window.location.search.includes('payment=success')) {
+            loadFormDataFromLocalStorage();
+            setTimeout(() => {
+                if (typeof generateAndDownloadPDF === 'function') {
+                    generateAndDownloadPDF();
+                    clearFormDataFromLocalStorage();
+                }
+            }, 500);
+        }
     </script>
 </body>
 </html
