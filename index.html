@@ -1086,52 +1086,70 @@
         }
 
         // PDF-Generierung und Vorschau
+        function formatEuro(amount) {
+            return amount.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
+        }
+
         function generatePDF() {
             const doc = new window.jspdf.jsPDF({unit: 'mm', format: 'a4'});
-            // Farben und Layout
-            const lightGray = [240, 240, 240];
-            const headerGray = [220, 220, 220];
-            const borderGray = [180, 180, 180];
+            // Layout-Parameter
+            const margin = 20;
+            const pageWidth = 210;
+            const contentWidth = pageWidth - 2 * margin;
+            const lightGray = [245, 245, 245];
+            const headerGray = [230, 230, 230];
+            const borderGray = [204, 204, 204];
+            const blue = [26, 115, 232];
             doc.setFont('helvetica', '');
+            // Optional: Rahmen um das Formular
+            doc.setDrawColor(...borderGray);
+            doc.setLineWidth(0.7);
+            doc.roundedRect(margin-2, margin-2, contentWidth+4, 257, 3, 3, 'S');
             // Titel
             doc.setFontSize(22);
-            doc.text('Reisekostenabrechnung', 105, 20, {align: 'center'});
-            doc.setLineWidth(0.5);
-            doc.setDrawColor(...borderGray);
-            doc.line(20, 25, 190, 25);
+            doc.setFont(undefined, 'bold');
+            doc.text('Reisekostenabrechnung', pageWidth/2, margin+8, {align: 'center'});
+            doc.setFont(undefined, 'normal');
             // Kopfbereich
-            doc.setFontSize(11);
-            let y = 32;
-            const purpose = document.getElementById('purpose').value || '';
-            const traveler = document.getElementById('traveler').value || '';
-            const department = document.getElementById('department').value || '';
-            const costCenter = document.getElementById('cost-center').value || '';
-            const startDate = document.getElementById('start-date').value ? new Date(document.getElementById('start-date').value).toLocaleString('de-DE') : '';
-            const endDate = document.getElementById('end-date').value ? new Date(document.getElementById('end-date').value).toLocaleString('de-DE') : '';
-            const transportType = document.getElementById('transport-type').options[document.getElementById('transport-type').selectedIndex].text;
-            const applicantName = document.getElementById('applicant-name').value || '';
-            const approverName = document.getElementById('approver-name').value || '';
-            doc.setFillColor(...lightGray);
-            doc.rect(20, y-5, 170, 32, 'F');
-            doc.setTextColor(60,60,60);
-            doc.text(`Name: ${traveler}`, 24, y); y += 7;
-            doc.text(`Abteilung: ${department}`, 24, y); y += 7;
-            doc.text(`Kostenträger: ${costCenter}`, 24, y); y += 7;
-            doc.text(`Reisezweck: ${purpose}`, 24, y); y += 7;
-            doc.text(`Zeitraum: ${startDate} bis ${endDate}`, 24, y); y += 7;
-            doc.text(`Transportmittel: ${transportType}`, 24, y); y += 7;
-            y += 2;
-            // Tagespauschalen-Tabelle
+            let y = margin+18;
+            doc.setFillColor(...headerGray);
+            doc.rect(margin, y, contentWidth, 28, 'F');
             doc.setFontSize(12);
-            doc.setTextColor(0,0,0);
+            doc.setTextColor(60,60,60);
+            let traveler = document.getElementById('traveler').value || '';
+            let department = document.getElementById('department').value || '';
+            let costCenter = document.getElementById('cost-center').value || '';
+            let purpose = document.getElementById('purpose').value || '';
+            let startDate = document.getElementById('start-date').value ? new Date(document.getElementById('start-date').value) : null;
+            let endDate = document.getElementById('end-date').value ? new Date(document.getElementById('end-date').value) : null;
+            let transportType = document.getElementById('transport-type').options[document.getElementById('transport-type').selectedIndex].text;
+            let applicantName = document.getElementById('applicant-name').value || '';
+            // Zeitraum-Formatierung
+            let zeitraum = '';
+            if (startDate && endDate) {
+                zeitraum = `${startDate.toLocaleDateString('de-DE')}, ${startDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit'})} bis ${endDate.toLocaleDateString('de-DE')}, ${endDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit'})}`;
+            }
+            let kopfzeilen = [
+                `Name: ${traveler}`,
+                `Abteilung: ${department}`,
+                `Kostenträger: ${costCenter}`,
+                `Reisezweck: ${purpose}`,
+                `Zeitraum: ${zeitraum}`,
+                `Transportmittel: ${transportType}`
+            ];
+            let yKopf = y+7;
+            kopfzeilen.forEach(line => {
+                doc.text(line, margin+4, yKopf);
+                yKopf += 4.5;
+            });
+            y = y+28+6;
+            // Tabelle 1: Verpflegungspauschalen
             let dailyRows = [];
-            const start = document.getElementById('start-date').value ? new Date(document.getElementById('start-date').value) : null;
-            const end = document.getElementById('end-date').value ? new Date(document.getElementById('end-date').value) : null;
-            if (start && end) {
-                const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+            if (startDate && endDate) {
+                const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
                 for (let i = 0; i < days; i++) {
-                    const currentDate = new Date(start);
-                    currentDate.setDate(start.getDate() + i);
+                    const currentDate = new Date(startDate);
+                    currentDate.setDate(startDate.getDate() + i);
                     const dateStr = currentDate.toLocaleDateString('de-DE', {weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit'});
                     const baseAmount = (i === 0 || i === days - 1) ? 14.00 : 28.00;
                     const breakfast = document.getElementById(`day-${i}-breakfast`)?.checked;
@@ -1148,9 +1166,9 @@
                     if (dinner) deductionText.push('Abendessen');
                     dailyRows.push([
                         dateStr,
-                        `${baseAmount.toFixed(2)} €`,
+                        formatEuro(baseAmount),
                         deductionText.join(', '),
-                        `${finalAmount.toFixed(2)} €`
+                        formatEuro(finalAmount)
                     ]);
                 }
                 doc.autoTable({
@@ -1158,15 +1176,15 @@
                     head: [['Datum', 'Pauschale', 'Kürzungen', 'Summe']],
                     body: dailyRows,
                     theme: 'grid',
-                    styles: {fontSize: 11, cellPadding: 2, lineColor: borderGray, lineWidth: 0.3},
-                    headStyles: {fillColor: headerGray, textColor: 60, fontStyle: 'bold'},
-                    alternateRowStyles: {fillColor: lightGray},
-                    margin: {left: 20, right: 20},
-                    tableWidth: 170,
+                    styles: {fontSize: 11, cellPadding: 3.5, lineColor: borderGray, lineWidth: 0.3, valign: 'middle'},
+                    headStyles: {fillColor: lightGray, textColor: 60, fontStyle: 'bold'},
+                    alternateRowStyles: {fillColor: [255,255,255]},
+                    margin: {left: margin, right: margin},
+                    tableWidth: contentWidth,
                 });
                 y = doc.lastAutoTable.finalY + 8;
             }
-            // Haupttabelle Kosten
+            // Tabelle 2: Einzelpositionen
             let transport = document.getElementById('transportation-costs').textContent || '0,00 €';
             let allowances = document.getElementById('summary-allowances').textContent || '0,00 €';
             let additionalRows = [];
@@ -1181,46 +1199,54 @@
                 });
             }
             let overnight = additionalRows.filter(r => r[0].includes('Übernachtung')).reduce((sum, r) => sum + parseFloat((r[1]||'0').replace(',','.')), 0);
-            let otherCosts = additionalRows.filter(r => !r[0].includes('Übernachtung')).reduce((sum, r) => sum + parseFloat((r[1]||'0').replace(',','.')), 0);
             let transportVal = parseFloat((transport.match(/[\d,.]+/)||['0'])[0].replace(',','.'));
-            let allowancesVal = parseFloat((allowances.match(/[,\d.]+/)||['0'])[0].replace(',','.'));
+            let allowancesVal = parseFloat((allowances.match(/[\d,.]+/)||['0'])[0].replace(',','.'));
             let total = document.getElementById('total-amount').textContent || '0,00 €';
+            let posRows = [
+                ['Fahrtkosten', transportType, formatEuro(transportVal)],
+                ['Verpflegungspauschalen', '', formatEuro(allowancesVal)],
+                ['Übernachtungskosten', '', formatEuro(overnight)]
+            ];
+            posRows = posRows.concat(
+                additionalRows.filter(r => !r[0].includes('Übernachtung')).map(r => ['Nebenkosten', r[0], r[1]])
+            );
             doc.autoTable({
                 startY: y,
                 head: [['Position', 'Beschreibung', 'Betrag (€)']],
-                body: [
-                    ['Fahrtkosten', transportType, transportVal.toFixed(2)],
-                    ['Verpflegungspauschalen', '', allowancesVal.toFixed(2)],
-                    ['Übernachtungskosten', '', overnight ? overnight.toFixed(2) : '0.00'],
-                    ...additionalRows.filter(r => !r[0].includes('Übernachtung')).map(r => ['Nebenkosten', r[0], parseFloat((r[1]||'0').replace(',','.')).toFixed(2)]),
-                ],
+                body: posRows,
                 theme: 'grid',
-                styles: {fontSize: 11, cellPadding: 2, lineColor: borderGray, lineWidth: 0.3},
-                headStyles: {fillColor: headerGray, textColor: 60, fontStyle: 'bold'},
-                alternateRowStyles: {fillColor: lightGray},
-                margin: {left: 20, right: 20},
-                tableWidth: 170,
+                styles: {fontSize: 11, cellPadding: 3.5, lineColor: borderGray, lineWidth: 0.3, valign: 'middle'},
+                headStyles: {fillColor: lightGray, textColor: 60, fontStyle: 'bold'},
+                alternateRowStyles: {fillColor: [255,255,255]},
+                margin: {left: margin, right: margin},
+                tableWidth: contentWidth,
             });
             y = doc.lastAutoTable.finalY + 8;
-            // Summenbereich
-            doc.setFontSize(13);
-            doc.setTextColor(30,64,175);
-            doc.text(`Gesamtbetrag: ${total}`, 24, y);
+            // Gesamtbetrag
+            doc.setFontSize(14);
+            doc.setTextColor(...blue);
+            doc.setFont(undefined, 'bold');
+            doc.text(`Gesamtbetrag: ${total.replace('.', ',')}`, margin, y);
+            doc.setFont(undefined, 'normal');
             doc.setTextColor(0,0,0);
-            y += 12;
-            // Unterschrift
+            y += 16;
+            // Abschlussbereich
+            doc.setLineWidth(0.3);
+            doc.line(margin, y, margin+80, y);
             doc.setFontSize(11);
-            doc.text('Ort, Datum, Unterschrift:', 24, y);
-            doc.line(60, y+1, 120, y+1);
+            doc.text('Ort, Datum, Unterschrift:', margin, y-1.5);
             y += 10;
-            if(applicantName) doc.text(`Antragsteller: ${applicantName}`, 24, y);
-            if(approverName) doc.text(`Genehmiger: ${approverName}`, 80, y);
+            if(applicantName) doc.text(`Antragsteller: ${applicantName}`, margin, y);
             return doc;
         }
 
         function generateAndDownloadPDF() {
             const doc = generatePDF();
-            doc.save('Reisekostenabrechnung.pdf');
+            let traveler = document.getElementById('traveler').value || 'Reisender';
+            let startDate = document.getElementById('start-date').value ? new Date(document.getElementById('start-date').value) : null;
+            let dateStr = startDate ? startDate.toLocaleDateString('de-DE') : '';
+            const fileName = `Reisekostenabrechnung_${traveler.replace(/\s+/g, '_')}_${dateStr}.pdf`;
+            doc.save(fileName);
         }
 
         function showPdfPreview() {
