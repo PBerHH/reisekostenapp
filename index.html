@@ -837,6 +837,7 @@
 
         // --- BERECHNUNGS- UND ZUSAMMENFASSUNGSLOGIK ---
         let additionalCosts = [];
+        let mealSelections = {};
 
         // Kostenliste aktualisieren
         function updateCostsList() {
@@ -908,6 +909,18 @@
                 alert('Bitte geben Sie ein gültiges Start- und Enddatum ein.');
                 return;
             }
+            // --- MAHLZEITEN-CHECKBOXEN SPEICHERN ---
+            const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+            for (let i = 0; i < days; i++) {
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + i);
+                const dateKey = currentDate.toISOString().slice(0,10);
+                mealSelections[dateKey] = {
+                    breakfast: document.getElementById(`day-${i}-breakfast`)?.checked || false,
+                    lunch: document.getElementById(`day-${i}-lunch`)?.checked || false,
+                    dinner: document.getElementById(`day-${i}-dinner`)?.checked || false
+                };
+            }
             // Tägliche Verpflegungspauschalen berechnen
             const dailyAllowances = document.getElementById('daily-allowances');
             dailyAllowances.innerHTML = `
@@ -925,31 +938,33 @@
                         </thead>
                         <tbody class="divide-y divide-gray-200">
             `;
-            let totalDailyAllowance = 0;
-            const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
             for (let i = 0; i < days; i++) {
                 const currentDate = new Date(startDate);
                 currentDate.setDate(startDate.getDate() + i);
                 const dateStr = currentDate.toLocaleDateString('de-DE', {
                     weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit'
                 });
+                const dateKey = currentDate.toISOString().slice(0,10);
                 let dailyAmount = 28.00;
                 if (i === 0 || i === days - 1) dailyAmount = 14.00;
-                const dayId = `day-${i}`;
+                // --- MAHLZEITEN AUS SPEICHER LESEN ---
+                const breakfastChecked = mealSelections[dateKey]?.breakfast || false;
+                const lunchChecked = mealSelections[dateKey]?.lunch || false;
+                const dinnerChecked = mealSelections[dateKey]?.dinner || false;
                 dailyAllowances.querySelector('tbody').innerHTML += `
                     <tr class="bg-white">
                         <td class="px-4 py-3 text-sm text-gray-900">${dateStr}</td>
                         <td class="px-4 py-3 text-sm text-gray-900">${dailyAmount.toFixed(2)} €</td>
                         <td class="px-4 py-3 text-center">
-                            <input type="checkbox" id="${dayId}-breakfast" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" onchange="calculateDailyAmount('${dayId}')">
+                            <input type="checkbox" id="day-${i}-breakfast" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" onchange="calculateDailyAmount('day-${i}')" ${breakfastChecked ? 'checked' : ''}>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <input type="checkbox" id="${dayId}-lunch" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" onchange="calculateDailyAmount('${dayId}')">
+                            <input type="checkbox" id="day-${i}-lunch" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" onchange="calculateDailyAmount('day-${i}')" ${lunchChecked ? 'checked' : ''}>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <input type="checkbox" id="${dayId}-dinner" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" onchange="calculateDailyAmount('${dayId}')">
+                            <input type="checkbox" id="day-${i}-dinner" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" onchange="calculateDailyAmount('day-${i}')" ${dinnerChecked ? 'checked' : ''}>
                         </td>
-                        <td class="px-4 py-3 text-right text-sm font-medium" id="${dayId}-total">${dailyAmount.toFixed(2)} €</td>
+                        <td class="px-4 py-3 text-right text-sm font-medium" id="day-${i}-total">${dailyAmount.toFixed(2)} €</td>
                     </tr>
                 `;
             }
@@ -1002,7 +1017,7 @@
                 additionalCostsSummary.innerHTML = '<p class="text-sm text-gray-500" id="no-additional-costs">Keine zusätzlichen Kosten erfasst</p>';
             }
             // Gesamtbetrag berechnen und anzeigen
-            const totalAmount = totalDailyAllowance + transportAmount + totalAdditionalCosts;
+            const totalAmount = transportAmount + totalAdditionalCosts;
             document.getElementById('total-amount').textContent = `${totalAmount.toFixed(2)}€`;
             // Ergebnisse anzeigen
             document.getElementById('summary-placeholder').classList.add('hidden');
