@@ -1249,6 +1249,10 @@
                 window.additionalCosts = data.additionalCosts;
                 updateCostsList();
             }
+            // Nach dem Laden: Zusammenfassung und Berechnung aktualisieren
+            if (typeof calculateTravelExpenses === 'function') {
+                calculateTravelExpenses();
+            }
         }
 
         function clearFormDataFromLocalStorage() {
