@@ -1115,12 +1115,13 @@
             const lightGray = [245, 245, 245];
             const headerGray = [230, 230, 230];
             const borderGray = [204, 204, 204];
-            const blue = [26, 115, 232];
+            const blue = [0, 51, 153]; // #003399
+            const altRow = [249, 249, 249]; // Alternierende Zeilenfarbe
             doc.setFont('helvetica', '');
             // Rahmen um das Formular
             doc.setDrawColor(...borderGray);
             doc.setLineWidth(0.7);
-            doc.roundedRect(margin-2, margin-2, contentWidth+4, 257, 3, 3, 'S');
+            doc.roundedRect(margin-2, margin-2, contentWidth+4, 257, 6, 6, 'S');
             // Titel
             doc.setFontSize(26);
             doc.setFont(undefined, 'bold');
@@ -1133,7 +1134,7 @@
             // Kopfbereich
             let y = margin+20;
             doc.setFillColor(...headerGray);
-            doc.roundedRect(margin, y, contentWidth, 34, 3, 3, 'F');
+            doc.roundedRect(margin, y, contentWidth, 34, 6, 6, 'F');
             doc.setFontSize(12);
             doc.setTextColor(60,60,60);
             let traveler = document.getElementById('traveler').value || '';
@@ -1162,7 +1163,7 @@
                 doc.text(line, margin+6, yKopf);
                 yKopf += 4.8;
             });
-            y = y+34+10;
+            y = y+34+16; // Abstand zur ersten Tabelle
             // Tabelle 1: Verpflegungspauschalen
             let dailyRows = [];
             let totalAllowances = 0;
@@ -1198,9 +1199,9 @@
                     head: [['Datum', 'Pauschale', 'Kürzungen (ggf.)', 'Summe']],
                     body: dailyRows,
                     theme: 'grid',
-                    styles: {fontSize: 11, cellPadding: 3.8, lineColor: borderGray, lineWidth: 0.3, valign: 'middle', halign: 'left'},
-                    headStyles: {fillColor: lightGray, textColor: 60, fontStyle: 'bold'},
-                    alternateRowStyles: {fillColor: [255,255,255]},
+                    styles: {fontSize: 12, cellPadding: {top: 4, right: 8, bottom: 4, left: 8}, lineColor: borderGray, lineWidth: 0.3, valign: 'middle', halign: 'left'},
+                    headStyles: {fontSize: 14, fillColor: lightGray, textColor: 60, fontStyle: 'bold'},
+                    alternateRowStyles: {fillColor: altRow},
                     columnStyles: {1: {halign: 'right'}, 2: {halign: 'center'}, 3: {halign: 'right'}},
                     margin: {left: margin, right: margin},
                     tableWidth: contentWidth,
@@ -1210,7 +1211,7 @@
                         }
                     }
                 });
-                y = doc.lastAutoTable.finalY + 12;
+                y = doc.lastAutoTable.finalY + 16;
             }
             // Tabelle 2: Einzelpositionen
             let transport = document.getElementById('transportation-costs').textContent || '0,00 €';
@@ -1245,9 +1246,9 @@
                 head: [['Position', 'Beschreibung', 'Betrag (\u202f€)']],
                 body: posRows,
                 theme: 'grid',
-                styles: {fontSize: 11, cellPadding: 4.2, lineColor: borderGray, lineWidth: 0.3, valign: 'middle', halign: 'left'},
-                headStyles: {fillColor: lightGray, textColor: 60, fontStyle: 'bold'},
-                alternateRowStyles: {fillColor: [255,255,255]},
+                styles: {fontSize: 12, cellPadding: {top: 4, right: 8, bottom: 4, left: 8}, lineColor: borderGray, lineWidth: 0.3, valign: 'middle', halign: 'left'},
+                headStyles: {fontSize: 14, fillColor: lightGray, textColor: 60, fontStyle: 'bold'},
+                alternateRowStyles: {fillColor: altRow},
                 columnStyles: {2: {halign: 'right'}},
                 margin: {left: margin, right: margin},
                 tableWidth: contentWidth,
@@ -1257,20 +1258,22 @@
                     }
                 }
             });
-            y = doc.lastAutoTable.finalY + 14;
+            y = doc.lastAutoTable.finalY + 18;
             // Gesamtbetrag
-            doc.setFontSize(15);
+            doc.setFontSize(16);
             doc.setTextColor(...blue);
             doc.setFont(undefined, 'bold');
             doc.text(`Gesamtbetrag: ${formatEuro(total)}`, margin, y);
             doc.setFont(undefined, 'normal');
             doc.setTextColor(0,0,0);
-            y += 22;
+            y += 24;
             // Abschlussbereich
-            doc.setLineWidth(0.3);
-            doc.line(margin+5, y, margin+85, y);
             doc.setFontSize(12);
-            doc.text('Ort, Datum, Unterschrift:', margin+5, y-2.5);
+            doc.text('Ort, Datum:', margin+5, y);
+            doc.line(margin+30, y+0.5, margin+85, y+0.5);
+            y += 10;
+            doc.text('Unterschrift:', margin+5, y);
+            doc.line(margin+30, y+0.5, margin+85, y+0.5);
             y += 10;
             if(applicantName) doc.text(`Antragsteller: ${applicantName}`, margin+5, y);
             return doc;
