@@ -133,6 +133,24 @@
             max-height: calc(90vh - 80px);
             overflow-y: auto;
             margin-top: 20px;
+            background: #fff;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+        #pdf-viewer canvas {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin: 0 auto;
+            display: block;
+            width: 595px !important; /* DIN A4 Breite px @ 72dpi */
+            height: 842px !important; /* DIN A4 Höhe px @ 72dpi */
+            max-width: 100%;
+            max-height: 100%;
         }
         .watermark {
             position: fixed;
@@ -1022,6 +1040,10 @@
             // Ergebnisse anzeigen
             document.getElementById('summary-placeholder').classList.add('hidden');
             document.getElementById('results-container').classList.remove('hidden');
+            // Nach dem Rendern: Tagespauschalen und Gesamtsumme berechnen
+            for (let i = 0; i < days; i++) {
+                calculateDailyAmount(`day-${i}`);
+            }
         }
         // Tagespauschale berechnen
         function calculateDailyAmount(dayId) {
@@ -1046,9 +1068,10 @@
             const dailyTotals = document.querySelectorAll('[id$="-total"]');
             dailyTotals.forEach(element => {
                 const amountText = element.textContent;
-                const amount = parseFloat(amountText.replace('€', '').trim());
+                const amount = parseFloat(amountText.replace('€', '').replace(',', '.').trim());
                 if (!isNaN(amount)) total += amount;
             });
+            // Wert immer korrekt anzeigen
             document.getElementById('total-daily-allowance').textContent = `${total.toFixed(2)} €`;
             document.getElementById('summary-allowances').textContent = `${total.toFixed(2)} €`;
             updateTotalAmount();
