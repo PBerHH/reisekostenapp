@@ -1109,8 +1109,10 @@
             const startDate = document.getElementById('start-date').value ? new Date(document.getElementById('start-date').value).toLocaleString('de-DE') : '';
             const endDate = document.getElementById('end-date').value ? new Date(document.getElementById('end-date').value).toLocaleString('de-DE') : '';
             const transportType = document.getElementById('transport-type').options[document.getElementById('transport-type').selectedIndex].text;
+            const applicantName = document.getElementById('applicant-name').value || '';
+            const approverName = document.getElementById('approver-name').value || '';
             doc.setFillColor(...lightGray);
-            doc.rect(20, y-5, 170, 28, 'F');
+            doc.rect(20, y-5, 170, 32, 'F');
             doc.setTextColor(60,60,60);
             doc.text(`Name: ${traveler}`, 24, y); y += 7;
             doc.text(`Abteilung: ${department}`, 24, y); y += 7;
@@ -1119,14 +1121,54 @@
             doc.text(`Zeitraum: ${startDate} bis ${endDate}`, 24, y); y += 7;
             doc.text(`Transportmittel: ${transportType}`, 24, y); y += 7;
             y += 2;
-            // Haupttabelle
+            // Tagespauschalen-Tabelle
             doc.setFontSize(12);
             doc.setTextColor(0,0,0);
-            // Fahrtkosten
+            let dailyRows = [];
+            const start = document.getElementById('start-date').value ? new Date(document.getElementById('start-date').value) : null;
+            const end = document.getElementById('end-date').value ? new Date(document.getElementById('end-date').value) : null;
+            if (start && end) {
+                const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+                for (let i = 0; i < days; i++) {
+                    const currentDate = new Date(start);
+                    currentDate.setDate(start.getDate() + i);
+                    const dateStr = currentDate.toLocaleDateString('de-DE', {weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit'});
+                    const baseAmount = (i === 0 || i === days - 1) ? 14.00 : 28.00;
+                    const breakfast = document.getElementById(`day-${i}-breakfast`)?.checked;
+                    const lunch = document.getElementById(`day-${i}-lunch`)?.checked;
+                    const dinner = document.getElementById(`day-${i}-dinner`)?.checked;
+                    let deductions = 0;
+                    if (breakfast) deductions += 5.60;
+                    if (lunch) deductions += 11.20;
+                    if (dinner) deductions += 11.20;
+                    const finalAmount = Math.max(0, baseAmount - deductions);
+                    let deductionText = [];
+                    if (breakfast) deductionText.push('Frühstück');
+                    if (lunch) deductionText.push('Mittagessen');
+                    if (dinner) deductionText.push('Abendessen');
+                    dailyRows.push([
+                        dateStr,
+                        `${baseAmount.toFixed(2)} €`,
+                        deductionText.join(', '),
+                        `${finalAmount.toFixed(2)} €`
+                    ]);
+                }
+                doc.autoTable({
+                    startY: y,
+                    head: [['Datum', 'Pauschale', 'Kürzungen', 'Summe']],
+                    body: dailyRows,
+                    theme: 'grid',
+                    styles: {fontSize: 11, cellPadding: 2, lineColor: borderGray, lineWidth: 0.3},
+                    headStyles: {fillColor: headerGray, textColor: 60, fontStyle: 'bold'},
+                    alternateRowStyles: {fillColor: lightGray},
+                    margin: {left: 20, right: 20},
+                    tableWidth: 170,
+                });
+                y = doc.lastAutoTable.finalY + 8;
+            }
+            // Haupttabelle Kosten
             let transport = document.getElementById('transportation-costs').textContent || '0,00 €';
-            // Verpflegungspauschalen
             let allowances = document.getElementById('summary-allowances').textContent || '0,00 €';
-            // Zusätzliche Kosten
             let additionalRows = [];
             const additionalCostsSummary = document.getElementById('additional-costs-summary');
             if (additionalCostsSummary) {
@@ -1138,22 +1180,14 @@
                     }
                 });
             }
-            // Übernachtungskosten (aus Zusatzkosten extrahieren)
             let overnight = additionalRows.filter(r => r[0].includes('Übernachtung')).reduce((sum, r) => sum + parseFloat((r[1]||'0').replace(',','.')), 0);
-            // Nebenkosten (alle anderen Zusatzkosten)
             let otherCosts = additionalRows.filter(r => !r[0].includes('Übernachtung')).reduce((sum, r) => sum + parseFloat((r[1]||'0').replace(',','.')), 0);
-            // Summen
             let transportVal = parseFloat((transport.match(/[\d,.]+/)||['0'])[0].replace(',','.'));
-            let allowancesVal = parseFloat((allowances.match(/[\d,.]+/)||['0'])[0].replace(',','.'));
+            let allowancesVal = parseFloat((allowances.match(/[,\d.]+/)||['0'])[0].replace(',','.'));
             let total = document.getElementById('total-amount').textContent || '0,00 €';
-            // Tabelle
             doc.autoTable({
                 startY: y,
-                head: [[
-                    'Position',
-                    'Beschreibung',
-                    'Betrag (€)'
-                ]],
+                head: [['Position', 'Beschreibung', 'Betrag (€)']],
                 body: [
                     ['Fahrtkosten', transportType, transportVal.toFixed(2)],
                     ['Verpflegungspauschalen', '', allowancesVal.toFixed(2)],
@@ -1178,6 +1212,9 @@
             doc.setFontSize(11);
             doc.text('Ort, Datum, Unterschrift:', 24, y);
             doc.line(60, y+1, 120, y+1);
+            y += 10;
+            if(applicantName) doc.text(`Antragsteller: ${applicantName}`, 24, y);
+            if(approverName) doc.text(`Genehmiger: ${approverName}`, 80, y);
             return doc;
         }
 
