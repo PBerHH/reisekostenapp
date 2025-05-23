@@ -485,6 +485,34 @@
                     <!-- Signature Fields -->
                     <div class="mt-8">
                         <h3 class="text-lg font-medium text-gray-700 mb-3 flex items-center">
+                            <i class="fas fa-university text-blue-500 mr-2"></i> 
+                            Kontodaten für Erstattung
+                            <span class="tooltip">
+                                <i class="fas fa-info-circle tooltip-icon"></i>
+                                <span class="tooltip-text">
+                                    Bitte geben Sie Ihre Kontodaten ein, damit wir Ihnen die Erstattung überweisen können.
+                                    Die IBAN ist ein Pflichtfeld.
+                                </span>
+                            </span>
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">IBAN <span class="text-red-500">*</span></label>
+                                <input type="text" id="iban" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">BIC</label>
+                                <input type="text" id="bic" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Kontoinhaber</label>
+                                <input type="text" id="account-holder" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8">
+                        <h3 class="text-lg font-medium text-gray-700 mb-3 flex items-center">
                             <i class="fas fa-signature text-blue-500 mr-2"></i> Unterschriftsfelder
                         </h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1132,34 +1160,35 @@
         function generatePDF() {
             const doc = new window.jspdf.jsPDF({unit: 'mm', format: 'a4'});
             // Layout-Parameter
-            const margin = 20;
+            const margin = 18;
             const pageWidth = 210;
             const contentWidth = pageWidth - 2 * margin;
-            const lightGray = [245, 245, 245];
-            const headerGray = [230, 230, 230];
-            const borderGray = [204, 204, 204];
-            const blue = [0, 51, 153]; // #003399
-            const altRow = [249, 249, 249]; // Alternierende Zeilenfarbe
+            const lightGray = [245, 247, 250];
+            const headerGray = [230, 235, 245];
+            const borderGray = [210, 210, 210];
+            const blue = [30, 64, 175]; // Tailwind blue-800
+            const altRow = [250, 252, 255];
             doc.setFont('helvetica', '');
+            // --- Variablen für Kontodaten immer deklarieren ---
+            const accountHolder = document.getElementById('account-holder') ? document.getElementById('account-holder').value : '';
+            const iban = document.getElementById('iban') ? document.getElementById('iban').value : '';
+            const bic = document.getElementById('bic') ? document.getElementById('bic').value : '';
             // Rahmen um das Formular
             doc.setDrawColor(...borderGray);
             doc.setLineWidth(0.7);
-            doc.roundedRect(margin-2, margin-2, contentWidth+4, 257, 6, 6, 'S');
+            doc.roundedRect(margin-2, margin-2, contentWidth+4, 265, 7, 7, 'S');
             // Titel
-            doc.setFontSize(26);
+            doc.setFontSize(22);
             doc.setFont(undefined, 'bold');
-            doc.text('Reisekostenabrechnung', pageWidth/2, margin+10, {align: 'center'});
+            doc.setTextColor(...blue);
+            doc.text('Reisekostenabrechnung', pageWidth/2, margin+7, {align: 'center'});
             doc.setFont(undefined, 'normal');
-            // Dünne Linie unter Titel
-            doc.setDrawColor(200,200,200);
-            doc.setLineWidth(0.5);
-            doc.line(margin, margin+14, pageWidth-margin, margin+14);
-            // Kopfbereich
-            let y = margin+20;
-            doc.setFillColor(...headerGray);
-            doc.roundedRect(margin, y, contentWidth, 34, 6, 6, 'F');
-            doc.setFontSize(12);
             doc.setTextColor(60,60,60);
+            // Kopfbereich als Box
+            let y = margin+20; // Erhöht, damit nichts abgeschnitten wird
+            doc.setFillColor(...headerGray);
+            doc.roundedRect(margin, y, contentWidth, 28, 5, 5, 'F');
+            doc.setFontSize(11);
             let traveler = document.getElementById('traveler').value || '';
             let department = document.getElementById('department').value || '';
             let costCenter = document.getElementById('cost-center').value || '';
@@ -1167,76 +1196,47 @@
             let startDate = document.getElementById('start-date').value ? new Date(document.getElementById('start-date').value) : null;
             let endDate = document.getElementById('end-date').value ? new Date(document.getElementById('end-date').value) : null;
             let transportType = document.getElementById('transport-type').options[document.getElementById('transport-type').selectedIndex].text;
-            let applicantName = document.getElementById('applicant-name').value || '';
-            // Zeitraum-Formatierung
             let zeitraum = '';
             if (startDate && endDate) {
                 zeitraum = `${startDate.toLocaleDateString('de-DE')}, ${startDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit'})} bis ${endDate.toLocaleDateString('de-DE')}, ${endDate.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit'})}`;
             }
             let kopfzeilen = [
-                `Name: ${traveler}`,
-                `Abteilung: ${department}`,
-                `Kostenträger: ${costCenter}`,
-                `Reisezweck: ${purpose}`,
-                `Zeitraum: ${zeitraum}`,
-                `Transportmittel: ${transportType}`
+                [`Name:`, traveler, `Abteilung:`, department],
+                [`Kostenträger:`, costCenter, `Zeitraum:`, zeitraum],
+                [`Reisezweck:`, purpose, `Transportmittel:`, transportType]
             ];
-            let yKopf = y+8;
-            kopfzeilen.forEach(line => {
-                doc.text(line, margin+6, yKopf);
-                yKopf += 4.8;
+            let yKopf = y+7.5;
+            kopfzeilen.forEach(row => {
+                doc.setFont(undefined, 'bold');
+                doc.text(row[0], margin+6, yKopf);
+                doc.setFont(undefined, 'normal');
+                doc.text(row[1] || '-', margin+32, yKopf);
+                doc.setFont(undefined, 'bold');
+                doc.text(row[2], margin+70, yKopf);
+                doc.setFont(undefined, 'normal');
+                doc.text(row[3] || '-', margin+98, yKopf);
+                yKopf += 6.5;
             });
-            y = y+34+16; // Abstand zur ersten Tabelle
-            // Tabelle 1: Verpflegungspauschalen
-            let dailyRows = [];
-            let totalAllowances = 0;
-            if (startDate && endDate) {
-                const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
-                for (let i = 0; i < days; i++) {
-                    const currentDate = new Date(startDate);
-                    currentDate.setDate(startDate.getDate() + i);
-                    const dateStr = currentDate.toLocaleDateString('de-DE', {weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit'});
-                    const baseAmount = (i === 0 || i === days - 1) ? 14.00 : 28.00;
-                    const breakfast = document.getElementById(`day-${i}-breakfast`)?.checked;
-                    const lunch = document.getElementById(`day-${i}-lunch`)?.checked;
-                    const dinner = document.getElementById(`day-${i}-dinner`)?.checked;
-                    let deductions = 0;
-                    if (breakfast) deductions += 5.60;
-                    if (lunch) deductions += 11.20;
-                    if (dinner) deductions += 11.20;
-                    const finalAmount = Math.max(0, baseAmount - deductions);
-                    totalAllowances += finalAmount;
-                    let deductionText = [];
-                    if (breakfast) deductionText.push('Frühstück');
-                    if (lunch) deductionText.push('Mittagessen');
-                    if (dinner) deductionText.push('Abendessen');
-                    dailyRows.push([
-                        dateStr,
-                        formatEuro(baseAmount),
-                        deductionText.length ? deductionText.join(', ') : '–',
-                        formatEuro(finalAmount)
-                    ]);
-                }
-                doc.autoTable({
-                    startY: y,
-                    head: [['Datum', 'Pauschale', 'Kürzungen (ggf.)', 'Summe']],
-                    body: dailyRows,
-                    theme: 'grid',
-                    styles: {fontSize: 12, cellPadding: {top: 4, right: 8, bottom: 4, left: 8}, lineColor: borderGray, lineWidth: 0.3, valign: 'middle', halign: 'left'},
-                    headStyles: {fontSize: 14, fillColor: lightGray, textColor: 60, fontStyle: 'bold'},
-                    alternateRowStyles: {fillColor: altRow},
-                    columnStyles: {1: {halign: 'right'}, 2: {halign: 'center'}, 3: {halign: 'right'}},
-                    margin: {left: margin, right: margin},
-                    tableWidth: contentWidth,
-                    didDrawCell: function (data) {
-                        if (data.section === 'body' && data.column.index === 3) {
-                            doc.setFont(undefined, 'bold');
-                        }
-                    }
-                });
-                y = doc.lastAutoTable.finalY + 16;
+            y = y+28+6;
+            // Kontodaten-Block
+            if (iban || accountHolder || bic) {
+                doc.setFontSize(11);
+                doc.setFillColor(...lightGray);
+                doc.roundedRect(margin, y, contentWidth, 16, 3, 3, 'F');
+                let yKonto = y+6.5;
+                doc.setFont(undefined, 'bold');
+                doc.text('Kontodaten für Erstattung:', margin+6, yKonto);
+                doc.setFont(undefined, 'normal');
+                let kontoText = '';
+                if (accountHolder) kontoText += `Kontoinhaber: ${accountHolder}   `;
+                if (iban) kontoText += `IBAN: ${iban}   `;
+                if (bic) kontoText += `BIC: ${bic}`;
+                doc.text(kontoText.trim(), margin+6, yKonto+6);
+                y += 16+6;
+            } else {
+                y += 10;
             }
-            // Tabelle 2: Einzelpositionen
+            // Tabelle: Positionen
             let transport = document.getElementById('transportation-costs').textContent || '0,00 €';
             let additionalRows = [];
             const additionalCostsSummary = document.getElementById('additional-costs-summary');
@@ -1250,59 +1250,54 @@
                 });
             }
             let overnight = additionalRows.filter(r => r[0].includes('Übernachtung')).reduce((sum, r) => sum + parseFloat((r[1]||'0').replace(',','.')), 0);
-            let transportVal = parseFloat((transport.match(/[\d,.]+/)||['0'])[0].replace(',','.'));
+            let transportVal = parseFloat((transport.match(/([0-9]+([\.,][0-9]+)?)/)||['0'])[0].replace(',','.'));
             let posRows = [
                 ['Fahrtkosten', transportType, formatEuro(transportVal)],
-                ['Verpflegungspauschalen', '', formatEuro(totalAllowances)],
+                ['Verpflegungspauschalen', '', document.getElementById('summary-allowances').textContent || '0,00 €'],
                 ['Übernachtungskosten', '', formatEuro(overnight)]
             ];
             posRows = posRows.concat(
                 additionalRows.filter(r => !r[0].includes('Übernachtung')).map(r => ['Nebenkosten', r[0], r[1]])
             );
-            // Gesamtbetrag korrekt berechnen
-            let total = transportVal + totalAllowances + overnight;
-            additionalRows.filter(r => !r[0].includes('Übernachtung')).forEach(r => {
-                total += parseFloat((r[1]||'0').replace(',','.'));
-            });
             doc.autoTable({
                 startY: y,
-                head: [['Position', 'Beschreibung', 'Betrag (\u202f€)']],
+                head: [['Position', 'Beschreibung', 'Betrag (/€)']],
                 body: posRows,
                 theme: 'grid',
-                styles: {fontSize: 12, cellPadding: {top: 4, right: 8, bottom: 4, left: 8}, lineColor: borderGray, lineWidth: 0.3, valign: 'middle', halign: 'left'},
-                headStyles: {fontSize: 14, fillColor: lightGray, textColor: 60, fontStyle: 'bold'},
+                styles: {fontSize: 11, cellPadding: {top: 3, right: 6, bottom: 3, left: 6}, lineColor: borderGray, lineWidth: 0.3, valign: 'middle', halign: 'left'},
+                headStyles: {fontSize: 12, fillColor: blue, textColor: 255, fontStyle: 'bold'},
                 alternateRowStyles: {fillColor: altRow},
                 columnStyles: {2: {halign: 'right'}},
                 margin: {left: margin, right: margin},
-                tableWidth: contentWidth,
-                didDrawCell: function (data) {
-                    if (data.section === 'body' && data.column.index === 2) {
-                        doc.setFont(undefined, 'bold');
-                    }
-                }
+                tableWidth: contentWidth
             });
-            y = doc.lastAutoTable.finalY + 18;
+            y = doc.lastAutoTable.finalY + 12;
             // Gesamtbetrag
-            doc.setFontSize(16);
-            doc.setTextColor(...blue);
+            let total = 0;
+            posRows.forEach(r => {
+                let betrag = parseFloat((r[2]||'0').replace(/[^0-9,\.]/g, '').replace(',', '.'));
+                if (!isNaN(betrag)) total += betrag;
+            });
+            doc.setFontSize(14);
             doc.setFont(undefined, 'bold');
+            doc.setTextColor(...blue);
             doc.text(`Gesamtbetrag: ${formatEuro(total)}`, margin, y);
             doc.setFont(undefined, 'normal');
             doc.setTextColor(0,0,0);
-            y += 24;
-            // Abschlussbereich
-            doc.setFontSize(12);
-            doc.text('Ort, Datum:', margin+5, y);
-            doc.line(margin+30, y+0.5, margin+85, y+0.5);
+            y += 18;
+            // Unterschriftsbereich
+            doc.setFontSize(11);
+            doc.text('Ort, Datum:', margin+2, y);
+            doc.line(margin+25, y+0.5, margin+80, y+0.5);
             y += 10;
-            doc.text('Unterschrift:', margin+5, y);
-            doc.line(margin+30, y+0.5, margin+85, y+0.5);
+            doc.text('Unterschrift Antragsteller:', margin+2, y);
+            doc.line(margin+45, y+0.5, margin+100, y+0.5);
             y += 10;
-            if(applicantName) doc.text(`Antragsteller: ${applicantName}`, margin+5, y);
             return doc;
         }
 
         function generateAndDownloadPDF() {
+            calculateTravelExpenses(); // Immer aktuelle Daten und Layout
             const doc = generatePDF();
             let traveler = document.getElementById('traveler').value || 'Reisender';
             let startDate = document.getElementById('start-date').value ? new Date(document.getElementById('start-date').value) : null;
@@ -1312,25 +1307,32 @@
         }
 
         function showPdfPreview() {
-            const doc = generatePDF();
-            const pdfData = doc.output('blob');
-            const url = URL.createObjectURL(pdfData);
-            const viewer = document.getElementById('pdf-viewer');
-            viewer.innerHTML = '';
-            const loadingTask = window.pdfjsLib.getDocument(url);
-            loadingTask.promise.then(function(pdf) {
-                pdf.getPage(1).then(function(page) {
-                    const scale = 1.2;
-                    const viewport = page.getViewport({ scale: scale });
-                    const canvas = document.createElement('canvas');
-                    const context = canvas.getContext('2d');
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
-                    viewer.appendChild(canvas);
-                    page.render({ canvasContext: context, viewport: viewport });
+            try {
+                calculateTravelExpenses(); // Immer aktuelle Daten und Layout
+                const doc = generatePDF();
+                const pdfData = doc.output('blob');
+                const url = URL.createObjectURL(pdfData);
+                const viewer = document.getElementById('pdf-viewer');
+                viewer.innerHTML = '';
+                const loadingTask = window.pdfjsLib.getDocument(url);
+                loadingTask.promise.then(function(pdf) {
+                    pdf.getPage(1).then(function(page) {
+                        const scale = 1.2;
+                        const viewport = page.getViewport({ scale: scale });
+                        const canvas = document.createElement('canvas');
+                        const context = canvas.getContext('2d');
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+                        viewer.appendChild(canvas);
+                        page.render({ canvasContext: context, viewport: viewport });
+                    });
+                }).catch(function(error) {
+                    viewer.innerHTML = '<div style="color:red; font-weight:bold;">Fehler beim Laden der PDF-Vorschau: '+error.message+'</div>';
                 });
-            });
-            document.getElementById('pdf-preview').style.display = 'block';
+                document.getElementById('pdf-preview').style.display = 'block';
+            } catch (e) {
+                alert('Fehler bei der PDF-Vorschau: ' + e.message);
+            }
         }
 
         function closePdfPreview() {
@@ -1351,7 +1353,10 @@
                 transportCost: document.getElementById('transport-cost').value,
                 applicantName: document.getElementById('applicant-name').value,
                 approverName: document.getElementById('approver-name').value,
-                additionalCosts: window.additionalCosts || []
+                additionalCosts: window.additionalCosts || [],
+                iban: document.getElementById('iban').value,
+                bic: document.getElementById('bic').value,
+                accountHolder: document.getElementById('account-holder').value
             };
             localStorage.setItem('travelFormData', JSON.stringify(data));
         }
@@ -1370,6 +1375,9 @@
             if (data.transportCost) document.getElementById('transport-cost').value = data.transportCost;
             if (data.applicantName) document.getElementById('applicant-name').value = data.applicantName;
             if (data.approverName) document.getElementById('approver-name').value = data.approverName;
+            if (data.iban) document.getElementById('iban').value = data.iban;
+            if (data.bic) document.getElementById('bic').value = data.bic;
+            if (data.accountHolder) document.getElementById('account-holder').value = data.accountHolder;
             if (Array.isArray(data.additionalCosts)) {
                 window.additionalCosts = data.additionalCosts;
                 updateCostsList();
@@ -1394,14 +1402,16 @@
         if (window.location.search.includes('payment=success')) {
             loadFormDataFromLocalStorage();
             setTimeout(() => {
-                if (typeof generateAndDownloadPDF === 'function') {
-                    // Nochmals kleinen Timeout, damit alle DOM-Updates und Berechnungen abgeschlossen sind
-                    setTimeout(() => {
+                if (typeof calculateTravelExpenses === 'function') {
+                    calculateTravelExpenses();
+                }
+                setTimeout(() => {
+                    if (typeof generateAndDownloadPDF === 'function') {
                         generateAndDownloadPDF();
                         clearFormDataFromLocalStorage();
-                    }, 500);
-                }
-            }, 500);
+                    }
+                }, 400); // Wartezeit, damit alles berechnet und DOM aktualisiert ist
+            }, 400);
         }
     </script>
 </body>
