@@ -1105,13 +1105,31 @@
             updateTotalAmount();
         }
         function updateTotalAmount() {
+            // Summiere alle Positionen wie in der PDF: Fahrtkosten, Verpflegung, Übernachtung, zusätzliche Kosten
             const allowancesText = document.getElementById('summary-allowances').textContent;
-            const allowancesAmount = parseFloat(allowancesText.replace('€', '').trim()) || 0;
+            const allowancesAmount = parseFloat(allowancesText.replace('€', '').replace(',', '.').trim()) || 0;
             const transportText = document.getElementById('transportation-costs').textContent;
             const transportAmount = parseFloat(transportText.replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
-            const additionalTotal = additionalCosts.reduce((sum, cost) => sum + cost.amount, 0);
-            const total = allowancesAmount + transportAmount + additionalTotal;
-            document.getElementById('total-amount').textContent = `${total.toFixed(2)}€`;
+            let overnight = 0;
+            let additionalTotal = 0;
+            const additionalCostsSummary = document.getElementById('additional-costs-summary');
+            if (additionalCostsSummary) {
+                const rows = additionalCostsSummary.querySelectorAll('div.flex');
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('span');
+                    if (cells.length === 2) {
+                        const type = cells[0].textContent;
+                        const betrag = parseFloat((cells[1].textContent||'0').replace('€','').replace(',','.'));
+                        if (type.includes('Übernachtung')) {
+                            overnight += betrag;
+                        } else {
+                            additionalTotal += betrag;
+                        }
+                    }
+                });
+            }
+            const total = allowancesAmount + transportAmount + overnight + additionalTotal;
+            document.getElementById('total-amount').textContent = `${total.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}€`;
         }
         // Event Listener für Berechnen-Button
         if (document.getElementById('calculate-btn')) {
@@ -1317,7 +1335,7 @@
                 const loadingTask = window.pdfjsLib.getDocument(url);
                 loadingTask.promise.then(function(pdf) {
                     pdf.getPage(1).then(function(page) {
-                        const scale = 1.2;
+                        const scale = 0.95; // Noch kleiner, damit nichts abgeschnitten wird
                         const viewport = page.getViewport({ scale: scale });
                         const canvas = document.createElement('canvas');
                         const context = canvas.getContext('2d');
@@ -1410,8 +1428,8 @@
                         generateAndDownloadPDF();
                         clearFormDataFromLocalStorage();
                     }
-                }, 400); // Wartezeit, damit alles berechnet und DOM aktualisiert ist
-            }, 400);
+                }, 800); // Länger warten, damit DOM und Berechnung wirklich fertig sind
+            }, 800);
         }
     </script>
 </body>
